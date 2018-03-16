@@ -9,6 +9,7 @@
   "author": "jdn-jdn",
   "license": "ISC",
   "dependencies": {
+    "ejs": "^2.5.7",
     "express": "^4.16.3"
   },
   "engines": {
