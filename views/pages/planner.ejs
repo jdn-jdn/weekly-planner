@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Weekly Planner</title>
+  <link href="./../../public/stylesheets/planner.css" rel="stylesheet" type="text/css"/>
+  <!-- <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
+</head>
+<body> 
+      <div class="a">
+        <!-- <button>Create task</button> -->
+
+
+        
+
+        <button id="popup" onclick="div_show()">Create task</button>    
+          <div id="abc">
+            <!-- Popup div starts here -->
+            <div id="popupContact">
+              <!-- Task creation form -->
+              <form action="/" id="form" method="post" name="form">
+                <img id="close" src="images/3.png" onclick ="div_hide()">
+                <h2>Task Information</h2>
+                <hr>
+
+                <select name="day_id">
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                    <option value="7">Sunday</option>
+                </select>
+
+                <input id="course" name="course" placeholder="Class" type="text">
+
+                <textarea id="description" name="description" placeholder="Task description"></textarea>
+
+                Due time:
+                <br>
+                <input id="due" name="due" type="time"> 
+                <br> 
+                <br>
+                Estimated work time (hours):
+                <br>
+                <input id="work_time" name="work_time" type="number" step="0.5"> 
+                <br> 
+                <br>
+                <a href="javascript:%20check_empty()" id="submit">
+                  Create task`
+                </a>
+              </form>
+            </div>
+            <!-- Popup div ends here -->
+          </div>
+
+
+
+
+        <div style="float: right">
+        <!-- <button>Update available time</button> -->
+
+
+          <button id="popup" onclick="div_show2()">Update available time</button>      
+          <div id="abc2">
+            <!-- Popup div starts here -->
+            <div id="popupContact">
+              <!-- Available time update form -->
+              <form action="/" id="form2" method="post" name="form2">
+                <img id="close" src="images/3.png" onclick ="div_hide2()">
+                <h2>Update available time</h2>
+                <hr>
+                <select name="day_id">
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                    <option value="7">Sunday</option>
+                </select>
+                Estimated available time (hours):
+                <br>
+                <input id="available_time" name="available_time" type="number" step="0.5"> 
+                <a href="javascript:%20check_empty2()" id="submit">
+                  Create task`
+                </a>
+              </form>
+            </div>
+          <!-- Popup Div Ends Here -->
+          </div>
+
+
+        </div>
+      </div>
+
+  <% for(var i = 0; i < Object.keys(days).length; i++) { %>
+    <div class="grid-container">
+      <div class="item1"><strong><%= days[i + 1].name %></strong></div>
+      <div class="item2">
+      </div>
+      <div class="item3">
+      </div>        
+      <div class="item4">
+        <% for(var j = 0; j < daysAndTasks.length; j++) { %>
+          <% if (daysAndTasks[j].day_id == i + 1 && daysAndTasks[j].task_id != null) { %>
+            <div style="padding-bottom: 1%; padding-top: 1%; border-bottom: 1px dotted black">
+              <b>Class</b>: <%= daysAndTasks[j].class %>                           </br> 
+              <b>Task</b>: <%= daysAndTasks[j].description %>                      </br>
+              <b>Due time</b>: 
+              <% if (daysAndTasks[j].due_time.split(':')[0] < 12) { %>
+                <%= daysAndTasks[j].due_time.split(':')[0] + ":" + daysAndTasks[j].due_time.split(':')[1] + " AM" %>
+              <% } else { %>
+                <%= (daysAndTasks[j].due_time.split(':')[0] - 12) + ":" + daysAndTasks[j].due_time.split(':')[1] + " PM" %>
+              <% } %>                     
+              </br>
+              <b>Estimated work time</b>: <%= daysAndTasks[j].total_work_time %>  
+              <div style="float: right">
+                  <!-- <a href=<%= daysAndTasks[j].task_id %>>Remove task</a> -->
+                  <form action="/" method="post">
+                    <input type="hidden" name="task_id" value=<%= daysAndTasks[j].task_id %>>
+                    <input type="submit" value="Remove task">
+                  </form>
+              </div>
+            </div> 
+          <% } else if (daysAndTasks[j].day_id == i + 1 && daysAndTasks[j].task_id == null) { %>
+            <em>No tasks to display.</em>
+          <% } %>        
+        <% } %>
+      </div>
+      <div class="item5">
+        <strong>Estimated work time</strong>:
+        <div style="float: right">
+          <%= days[i + 1].total_work_time_day %>
+        </div>
+      </div>
+      <div class="item6">
+        <strong>Estimated available time</strong>:
+        <div style="float: right">
+          <%= days[i + 1].total_available_time_day %>
+        </div>
+      </div>
+      <div class="item7">
+        <strong>Estimated total time</strong>:
+        <div style="float: right">
+          <% if ((days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) > 0) { %>
+            <%= "+" + (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
+          <% } else { %>
+            <%= (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  <% } %>  
+  <script>
+    // Validating empty fields
+    function check_empty() {
+      if (document.getElementById('course').value == ""       || 
+          document.getElementById('description').value == ""  || 
+          document.getElementById('due').value == ""          ||
+          document.getElementById('work_time').value == "") {
+        alert("Please fill all fields before submitting...");
+      } else {
+        document.getElementById('form').submit();
+        alert("Form submitted successfully...");
+      }
+    }
+
+// Displaying popup
+function div_show() {
+  document.getElementById('abc').style.display = "block";
+}
+
+//Hiding popup
+function div_hide(){
+  document.getElementById('abc').style.display = "none";
+}
+
+
+
+
+
+
+
+
+    // Validating empty fields
+    function check_empty2() {
+      if (document.getElementById('available_time').value == "") {
+        alert("Please fill all fields before submitting...");
+      } else {
+        document.getElementById('form2').submit();
+        alert("Form2 submitted successfully...");
+      }
+    }
+
+// Displaying popup
+function div_show2() {
+  document.getElementById('abc2').style.display = "block";
+}
+
+//Hiding popup
+function div_hide2(){
+  document.getElementById('abc2').style.display = "none";
+}
+  </script>
+</body>
+</html>
+
+
+
+
+<!-- 
+    <table>
+      <tr>
+          <td class="day">Day of the week</td>
+          <td class="createTask">
+            <a href="#myPopup" data-rel="popup" class="ui-btn ui-btn-inline ui-corner-all ui-icon-plus ui-btn-icon-left">
+              Create task
+            </a>
+            <div data-history="false" data-role="popup" id="myPopup" class="ui-content">
+              <form method="post" action="#">
+                <div>
+                  <h3>Task Information</h3>
+                  <label for="newTask" class="ui-hidden-accessible">Task:</label>
+                  <input type="text" name="newTask" id="newTask" placeholder="Task description">
+                  <input type="submit" value="Create Task">
+                </div>
+              </form>
+            </div>
+          </td>
+      </tr>
+
+      <tr>
+        <td colspan="3">Tasks</td>
+      </tr>
+
+      <tr>
+          <td class="time">Work time</td>
+          <td class="time">Available time</td>
+          <td class="time">Total time</td>
+      </tr>
+    </table> -->
+
+    <!--     table, th, td {
+        border: 1px solid black;
+    }
+
+    table{
+        width: 100%;
+    }
+
+  .day {
+    width: 15%;
+  }
+
+  .createTask {
+    width: 5%;
+  }
+
+  .time {
+    width: 33%;
+  } -->
