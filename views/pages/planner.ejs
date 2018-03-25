@@ -131,16 +131,16 @@
         <% for(var j = 0; j < daysAndTasks.length; j++) { %>
           <% if (daysAndTasks[j].day_id == i + 1 && daysAndTasks[j].task_id != null) { %>
             <div style="padding-bottom: 1%; padding-top: 1%; border-bottom: 1px dotted black">
-              <b>Class</b>: <%= daysAndTasks[j].class %>                           </br> 
-              <b>Task</b>: <%= daysAndTasks[j].description %>                      </br>
-              <b>Due time</b>: 
+              <strong>Class</strong>: <%= daysAndTasks[j].class %>                           </br> 
+              <strong>Task</strong>: <%= daysAndTasks[j].description %>                      </br>
+              <strong>Due time</strong>: 
               <% if (daysAndTasks[j].due_time.split(':')[0] < 12) { %>
                 <%= daysAndTasks[j].due_time.split(':')[0] + ":" + daysAndTasks[j].due_time.split(':')[1] + " AM" %>
               <% } else { %>
                 <%= (daysAndTasks[j].due_time.split(':')[0] - 12) + ":" + daysAndTasks[j].due_time.split(':')[1] + " PM" %>
               <% } %>                     
               </br>
-              <b>Estimated work time</b>: <%= daysAndTasks[j].total_work_time %>  
+              <strong>Estimated work time</strong>: <%= daysAndTasks[j].total_work_time %>  
               <div style="float: right">
                   <form action="/" method="post">
                     <input type="hidden" name="task_id" value=<%= daysAndTasks[j].task_id %>>
@@ -169,10 +169,16 @@
         <strong>Estimated total time</strong>:
         <div style="float: right" class="time-value">
           <% if ((days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) > 0) { %>
-            <%= "+" + (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
-          <% } else { %>
-            <%= (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
-          <% } %>
+            <span style="color: green">
+              <%= "+" + (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
+            </span>
+            <% } else if ((days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) < 0) { %>
+              <span style="color: red">
+                <%= (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
+              </span>
+            <% } else if ((days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) == 0) { %>
+                <%= (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
+            <% } %>
         </div>
       </div>
     </div>

@@ -47,7 +47,10 @@ function updatePage(results) {
     document.getElementById("week-available-time").innerHTML = weekAvailableTime;
 
     if (weekTotalTime > 0) {
-        document.getElementById("week-total-time").innerHTML = "+" + weekTotalTime;                
+        document.getElementById("week-total-time").innerHTML = "<span style='color: green'>+" + weekTotalTime + "</span>";                
+    }
+    else if (weekTotalTime < 0) {
+        document.getElementById("week-total-time").innerHTML = "<span style='color: red'>" + weekTotalTime + "</span>";                
     } else {
         document.getElementById("week-total-time").innerHTML = weekTotalTime;
     }
