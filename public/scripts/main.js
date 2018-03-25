@@ -12,7 +12,6 @@ function update() {
             //    updatePage(xmlhttp.responseText);
 
             console.log("Updating the divs with these results: " + xmlhttp.responseText);
-            // console.log("Back from the server with: " + xmlhttp.responseText);
             var week = JSON.parse(xmlhttp.responseText);
         
             var weekWorkTime = 0;
@@ -58,24 +57,4 @@ function update() {
 function updatePage(results) {
 	console.log("Updating the divs with these results: " + results);
     console.log("Back from the server with: " + xmlhttp.responseText);
-    var data = xmlhttp.responseText;
-
-    for (const day in data) {
-        console.log(day);
-    }
-
-
-
-    
-    // document.getElementById("week-work-time").innerHTML = xmlhttp.responseText;
-    // document.getElementById("week-available-time").innerHTML = xmlhttp.responseText;
-    // document.getElementById("week-total-time").innerHTML = xmlhttp.responseText;
 }
-
-/*
-        <div style="float: right" id="week-work-time">
-
-        <div style="float: right" id="week-available-time">
-
-        <div style="float: right" id="week-total-time">
-*/
