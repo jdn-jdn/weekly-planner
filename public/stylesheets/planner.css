@@ -41,6 +41,11 @@
 .item4 {
     grid-column-start: 1;
     grid-column-end: 4;
+    padding-left: 1%;
+}
+
+.item5, .item6, .item7 {
+    padding-left: 3%;
 }
 
 .item3 {
