@@ -9,7 +9,9 @@
     margin-bottom: 2%;
 }
 
-.grid-container > div, .grid-container-week > div {
+.grid-container > .item1, .grid-container > .item4, .grid-container > .item5, .grid-container > .item6, .grid-container > .item7,
+.grid-container-week > .item1, .grid-container-week > .item4, .grid-container-week > .item5, .grid-container-week > .item6, .grid-container-week > .item7 
+{
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 16px;
 }
