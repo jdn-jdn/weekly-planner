@@ -16,11 +16,11 @@
       	<strong>Weekly Summary</strong>
       </div>
       <div class="item2-week">
-        <button id="popup" onclick="div_show()">Create task</button>    
+        <button id="popup" onclick="div_show()" class="task-btn">Create task</button>    
         <div id="abc">
           <div id="popupContact"> <!-- Popup div starts here -->
             <form action="/" id="form" method="post" name="form"> <!-- Task creation form -->
-              <img id="close" src="images/3.png" onclick ="div_hide()">
+              <img id="close" src="images/close.png" onclick ="div_hide()">
               <h2>Task Information</h2>
               <hr>
               <select name="day_id">
@@ -52,14 +52,14 @@
           </div> <!-- Popup div ends here -->
         </div>      	
         <div style="float: right">
-          <button id="popup" onclick="div_show2()">
+          <button id="popup" onclick="div_show2()" class="task-btn">
             Update available time
           </button>      
           <div id="abc2">
             <div id="popupContact"> <!-- Popup div starts here -->
               <form action="/" id="form2" method="post" name="form2"> <!-- Available time update form -->
-                <img id="close" src="images/3.png" onclick ="div_hide2()">
-                <h2>Update available time</h2>
+                <img id="close-time" src="images/close.png" onclick ="div_hide2()">
+                <h2>Update Available Time</h2>
                 <hr>
                 <select name="day_id">
                   <option value="1">Monday</option>
@@ -70,11 +70,14 @@
                   <option value="6">Saturday</option>
                   <option value="7">Sunday</option>
                 </select>
+                <br/>
+                <br/>
                 Estimated available time (hours):
-                <br>
+                <br/>
                 <input id="available_time" name="available_time" type="number" step="0.5"> 
+                <br/><br/>
                 <a href="javascript:%20check_empty2()" id="submit">
-                  Create task`
+                  Update available time
                 </a>
               </form>
             </div>
@@ -83,7 +86,7 @@
       </div>
       <div class="item3-week">
       	<div style="float: right">
-      		<button id="btnUpdate" onclick="update()">Update summary</button>
+      		<button id="btnUpdate" onclick="update()" class="update-btn">Update summary</button>
       	</div>
       </div>      
       <div class="item4">
@@ -91,19 +94,19 @@
       </div>
       <div class="item5">
         <strong>Total work time for week</strong>:
-        <div style="float: right" id="week-work-time">
+        <div style="float: right" id="week-work-time" class="time-value">
           --
         </div>
       </div>
       <div class="item6">
         <strong>Total available time for week</strong>:
-        <div style="float: right" id="week-available-time">
+        <div style="float: right" id="week-available-time" class="time-value">
           --
         </div>
       </div>
       <div class="item7">
         <strong>Total time for week</strong>:
-        <div style="float: right" id="week-total-time">
+        <div style="float: right" id="week-total-time" class="time-value">
           --
         </div>
       </div>
@@ -140,7 +143,7 @@
                   <!-- <a href=<%= daysAndTasks[j].task_id %>>Remove task</a> -->
                   <form action="/" method="post">
                     <input type="hidden" name="task_id" value=<%= daysAndTasks[j].task_id %>>
-                    <input type="submit" value="Remove task">
+                    <input type="submit" value="Remove task" class="remove-btn">
                   </form>
               </div>
             </div> 
@@ -151,19 +154,19 @@
       </div>
       <div class="item5">
         <strong>Estimated work time</strong>:
-        <div style="float: right">
+        <div style="float: right" class="time-value">
           <%= days[i + 1].total_work_time_day %>
         </div>
       </div>
       <div class="item6">
         <strong>Estimated available time</strong>:
-        <div style="float: right">
+        <div style="float: right" class="time-value">
           <%= days[i + 1].total_available_time_day %>
         </div>
       </div>
       <div class="item7">
         <strong>Estimated total time</strong>:
-        <div style="float: right">
+        <div style="float: right" class="time-value">
           <% if ((days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) > 0) { %>
             <%= "+" + (days[i + 1].total_available_time_day - days[i + 1].total_work_time_day) %>
           <% } else { %>

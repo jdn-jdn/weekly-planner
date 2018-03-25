@@ -4,7 +4,7 @@
     grid-gap: 1px;
     background-color: #2196F3;
     padding: 8px;
-    max-width: 55%;
+    max-width: 58%;
     margin: auto;
     margin-bottom: 2%;
 }
@@ -12,6 +12,30 @@
 .grid-container > div, .grid-container-week > div {
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 16px;
+}
+
+.time-value {
+    margin-right: 3%;
+}
+
+.remove-btn {
+    background: -webkit-linear-gradient(top, #DD4B39, #D14836); 
+    background: -moz-linear-gradient(top, #DD4B39, #D14836); 
+    background: -ms-linear-gradient(top, #DD4B39, #D14836); 
+    border: 1px solid #DD4B39;
+    color: white;
+    text-shadow: 0 1px 0 #C04131;
+    cursor:pointer;
+}
+
+.update-btn {
+    background: -webkit-linear-gradient(top, rgb(0, 156, 78), rgb(0, 156, 78)); 
+    background: -moz-linear-gradient(top, rgb(0, 156, 78), rgb(0, 156, 78)); 
+    background: -ms-linear-gradient(top, rgb(0, 156, 78), rgb(0, 156, 78)); 
+    border: 1px solid rgb(0, 156, 78);
+    color: white;
+    text-shadow: 0 1px 0 rgb(0, 156, 78);
+    cursor:pointer;
 }
 
 .item4 {
@@ -56,6 +80,17 @@ img#close {
     right:-14px;
     top:-14px;
     cursor:pointer;
+    max-width: 6%;
+    max-height: 6%;
+}
+
+img#close-time {
+    position:absolute;
+    right:-14px;
+    top:-14px;
+    cursor:pointer;
+    max-width: 10%;
+    max-height: 10%;
 }
 
 div#popupContact {
@@ -72,9 +107,13 @@ div#popupContact {
     padding:10px 50px;
     border:2px solid gray;
     border-radius:10px;
-    font-family:raleway;
+    font-family: Cambria;
     background-color:#fff;
 }
+
+input[type = number]{
+    width: 18%;
+} 
 
 p {
     margin-top:30px;
@@ -146,7 +185,11 @@ span {
 }
 
 button {
-    background-color:rgb(15, 15, 139);
-    color:#fff;
+    background: -webkit-linear-gradient(top, rgb(15, 15, 139), rgb(15, 15, 139)); 
+    background: -moz-linear-gradient(top, rgb(15, 15, 139), rgb(15, 15, 139)); 
+    background: -ms-linear-gradient(top, rgb(15, 15, 139), rgb(15, 15, 139)); 
+    border: 1px solid rgb(15, 15, 139);
+    color: white;
+    text-shadow: 0 1px 0 rgb(15, 15, 139);
     cursor:pointer;
 }
