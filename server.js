@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')));
 app.use("/public/stylesheets", express.static(__dirname + "/public/stylesheets"));
+app.use("/public/scripts", express.static(__dirname + "/public/scripts"));
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
@@ -38,9 +39,63 @@ app.post('/', function(req, res) {
 	}
 });
 
+app.get('/weeklyUpdate', function (req, res) {
+	console.log('Got a request for an update');
+	getWeeklyUpdate(req, res);
+});
+
 app.listen(PORT, function() { 
 	console.log(`Listening on port ${ PORT }`);
 });
+
+
+
+function getWeeklyUpdate(request, response) {
+	// Use a helper function to query DB and provide callback after processing
+	getWeeklyUpdateFromDb(function(error, result) {
+		// Callback function that will be called when the DB done
+		if (error || result == null) {
+			response.status(500).json({success: false, data: error});
+		} else {
+			console.log("TEST!!!!!");
+			console.log(result);
+			response.json(result);
+		}
+	});
+}
+
+function getWeeklyUpdateFromDb(callback) {
+	console.log("Getting weekly update from DB");
+
+	var client = new pg.Client(connectionString);
+
+	client.connect(function(err) {
+		if (err) {
+			console.log("Error connecting to DB: ")
+			console.log(err);
+			callback(err, null);
+		}
+
+		var sql =  "SELECT *                      \
+		           	FROM day";
+
+		var query = client.query(sql, function(err, result) {
+			// Done getting data from DB; disconnect the client
+			client.end(function(err) {
+				if (err) throw err;
+			});
+
+			if (err) {
+				console.log("Error in query: ")
+				console.log(err);
+				callback(err, null);
+			}
+
+			// Giving results to callback
+			callback(null, result.rows);
+		});
+	});
+}
 
 function getDaysAndTasks(request, response) {
 	// Use a helper function to query DB and provide callback after processing
@@ -179,20 +234,20 @@ function insertNewTaskIntoDb(callback, req, res) {
 			callback(err, null);
 		}
 
-		var sql = "INSERT INTO task" 			+
-					"("							+
-					  "class"					+
-					", description"				+
-					", due_time"				+
-					", total_work_time"			+
-					") "						+
-					"VALUES"					+
-					"("							+ 
-					  "'" + course 		+ "'"	+ 
-					", '" + description + "'"	+ 
-					", '" + due 		+ "'"	+ 
-					", "  + work_time			+ 
-					") "						+
+		var sql = "INSERT INTO task"            +
+					"("                         +
+					  "class"                   +
+					", description"             +
+					", due_time"                +
+					", total_work_time"         +
+					") "                        +
+					"VALUES"                    +
+					"("                         + 
+					  "'" + course      + "'"   + 
+					", '" + description + "'"   + 
+					", '" + due         + "'"   + 
+					", "  + work_time           + 
+					") "                        +
 					"RETURNING task_id";
 
 		console.log(sql);

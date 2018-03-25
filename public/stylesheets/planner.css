@@ -1,15 +1,15 @@
-.grid-container {
+.grid-container, .grid-container-week {
     display: grid;
     grid-template-columns: auto auto auto;
     grid-gap: 1px;
     background-color: #2196F3;
     padding: 8px;
-    max-width: 50%;
+    max-width: 55%;
     margin: auto;
     margin-bottom: 2%;
 }
 
-.grid-container > div {
+.grid-container > div, .grid-container-week > div {
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 16px;
 }
@@ -23,12 +23,20 @@
     max-width: 0%;
 }
 
+.item3-week {
+    /*max-width: 33%;*/
+}
+
 .item1 {
     text-align: center;
 }
 
 .item2 {
     max-width: 0%;
+}
+
+.item2-week {
+    /*max-width: 33%;*/
 }
 
 

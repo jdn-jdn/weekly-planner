@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <title>Weekly Planner</title>
   <link href="./../../public/stylesheets/planner.css" rel="stylesheet" type="text/css"/>
-  <script src="./../../public/scripts/main.js"></script>
   <!-- <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
   <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
@@ -15,16 +14,9 @@
         <!-- <button>Create task</button> -->
 
 
+        
 
-
-
-
-	<div class="grid-container-week">
-      <div class="item1">
-      	<strong>Weekly Summary</strong>
-      </div>
-      <div class="item2-week">
-      	 <button id="popup" onclick="div_show()">Create task</button>    
+        <button id="popup" onclick="div_show()">Create task</button>    
           <div id="abc">
             <!-- Popup div starts here -->
             <div id="popupContact">
@@ -66,7 +58,9 @@
             <!-- Popup div ends here -->
           </div>
 
-      	
+
+
+
         <div style="float: right">
         <!-- <button>Update available time</button> -->
 
@@ -101,47 +95,8 @@
           </div>
 
 
-        </div>  
-      </div>
-      <div class="item3-week">
-      	<div style="float: right">
-      		<button id="btnUpdate" onclick="update()">Update summary</button>
-      	</div>
-      </div>      
-      <div class="item4">
-      </div>
-      <div class="item5">
-        <strong>Total work time for week</strong>:
-        <div style="float: right" id="week-work-time">
-          --
         </div>
       </div>
-      <div class="item6">
-        <strong>Total available time for week</strong>:
-        <div style="float: right" id="week-available-time">
-          --
-        </div>
-      </div>
-      <div class="item7">
-        <strong>Total time for week</strong>:
-        <div style="float: right" id="week-total-time">
-          --
-        </div>
-      </div>
-    </div>
-
-
-        
-
-       
-
-
-    <hr>
-    <br>
-
-
-      </div>
-
 
   <% for(var i = 0; i < Object.keys(days).length; i++) { %>
     <div class="grid-container">
