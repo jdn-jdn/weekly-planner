@@ -135,7 +135,8 @@ function getDaysAndTasksFromDb(callback) {
 					"INNER JOIN task as t "                                                         +
 						"ON td.task_id = t.task_id "                                                +
 					"RIGHT JOIN day as d "                                                          +
-						"ON td.day_id = d.day_id;";
+						"ON td.day_id = d.day_id "                                                  +
+                    "ORDER BY t.due_time ASC";
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
