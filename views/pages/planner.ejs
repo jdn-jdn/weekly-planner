@@ -142,7 +142,6 @@
               </br>
               <b>Estimated work time</b>: <%= daysAndTasks[j].total_work_time %>  
               <div style="float: right">
-                  <!-- <a href=<%= daysAndTasks[j].task_id %>>Remove task</a> -->
                   <form action="/" method="post">
                     <input type="hidden" name="task_id" value=<%= daysAndTasks[j].task_id %>>
                     <input type="submit" value="Remove task" class="remove-btn">
