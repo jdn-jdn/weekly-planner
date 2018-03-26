@@ -27,7 +27,8 @@
                 Task Information
               </h2>
               <hr>
-              <select name="day_id">
+              <select name="day_id" id="day_id">
+                <option value="None">Select a day</option>
                 <option value="1">Monday</option>
                 <option value="2">Tuesday</option>
                 <option value="3">Wednesday</option>
@@ -66,7 +67,8 @@
                   Update Available Time
                 </h2>
                 <hr>
-                <select name="day_id">
+                <select name="day_id" id="day_id2">
+                  <option value="None">Select a day</option>
                   <option value="1">Monday</option>
                   <option value="2">Tuesday</option>
                   <option value="3">Wednesday</option>
@@ -110,7 +112,7 @@
         </div>
       </div>
       <div class="item7">
-        <strong><em>Total</em> time for week</strong>:
+        <strong><em>Total time</em> for week</strong>:
         <div style="float: right" id="week-total-time" class="time-value">
           --
         </div>
@@ -191,7 +193,8 @@
     // Validating empty fields
     function check_empty() {
       if (document.getElementById('course').value == "" || document.getElementById('description').value == "" || 
-          document.getElementById('due').value    == "" || document.getElementById('work_time').value   == "") {
+          document.getElementById('due').value    == "" || document.getElementById('work_time').value   == "" ||
+          document.getElementById('day_id').value == "None") {
         alert("Please fill all fields before submitting");
       } else {
         document.getElementById('form').submit();
@@ -210,7 +213,7 @@
     
     // Validating empty fields
     function check_empty2() {
-      if (document.getElementById('available_time').value == "") {
+      if (document.getElementById('available_time').value == "" || document.getElementById('day_id2').value == "None") {
         alert("Please fill all fields before submitting");
       } else {
         document.getElementById('form2').submit();
