@@ -16,7 +16,7 @@
         <strong>Weekly Summary</strong>
       </div>
       <div class="item2-week">
-        <button id="popup" onclick="div_show()" class="task-btn" style="width: 100%">
+        <button id="popup" onclick="div_show()" class="task-btn" style="width: 97%; margin-top: 1%; margin-right: 0%; margin-left: 2%;">
           Create task
         </button>    
         <div id="abc">
@@ -54,7 +54,7 @@
           </div> <!-- Popup div ends here -->
         </div>
         <div>      	
-          <button id="popup" onclick="div_show2()" class="task-btn" style="width: 100%; margin-top: 1%">
+          <button id="popup" onclick="div_show2()" class="task-btn" style="width: 97%; margin-top: 1%; margin-right: 0%; margin-left: 2%;">
             Update available time
           </button>      
           <div id="abc2">
@@ -86,7 +86,7 @@
           </div> <!-- Popup Div Ends Here -->
         </div>  
       </div>
-      <div class="item3-week">
+      <div class="item3-week" style="margin-right: 2%; margin-left: 2%;">
         <button id="btnUpdate" onclick="update()" class="update-btn" style="width: 100%; height: 100%">
           Update summary            
         </button>
@@ -141,7 +141,7 @@
               <% } %>                     
               </br>
               <strong>Estimated work time</strong>: <%= daysAndTasks[j].total_work_time %>  
-              <div style="float: right">
+              <div style="float: right; margin-right: 1%;">
                   <form action="/" method="post">
                     <input type="hidden" name="task_id" value=<%= daysAndTasks[j].task_id %>>
                     <input type="submit" value="Remove task" class="remove-btn">
