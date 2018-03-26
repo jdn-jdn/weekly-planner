@@ -201,11 +201,11 @@ textarea {
     display:block;
     background-color:rgb(15, 15, 139);
     color:#fff;
-    background-color:rgb(15, 15, 139);
     padding:10px 0;
     font-size:20px;
     cursor:pointer;
     border-radius:5px;
+    font-family: Calibri;
 }
 
 span {

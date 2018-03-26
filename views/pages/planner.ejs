@@ -23,7 +23,9 @@
           <div id="popupContact"> <!-- Popup div starts here -->
             <form action="/" id="form" method="post" name="form"> <!-- Task creation form -->
               <img id="close" src="images/close.png" onclick ="div_hide()">
-              <h2>Task Information</h2>
+              <h2 style="color: rgb(15, 15, 139); font-family: Consolas, monospace;">
+                Task Information
+              </h2>
               <hr>
               <select name="day_id">
                 <option value="1">Monday</option>
@@ -35,8 +37,7 @@
                 <option value="7">Sunday</option>
               </select>
               <input id="course" name="course" placeholder="Class" type="text">
-              <textarea id="description" name="description" placeholder="Task description">
-              </textarea>
+              <textarea id="description" name="description" placeholder="Task description"></textarea>
               Due time:
               <br>
               <input id="due" name="due" type="time"> 
@@ -61,7 +62,9 @@
             <div id="popupContact"> <!-- Popup div starts here -->
               <form action="/" id="form2" method="post" name="form2"> <!-- Available time update form -->
                 <img id="close-time" src="images/close.png" onclick ="div_hide2()">
-                <h2>Update Available Time</h2>
+                <h2 style="color: rgb(15, 15, 139); font-family: Consolas, monospace;">
+                  Update Available Time
+                </h2>
                 <hr>
                 <select name="day_id">
                   <option value="1">Monday</option>
