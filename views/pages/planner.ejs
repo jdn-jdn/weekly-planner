@@ -12,11 +12,11 @@
 <body>
   <div class="a">
     <div class="grid-container-week">
-      <div class="item1">
-      	<strong>Weekly Summary</strong>
+      <div class="item1" style="padding-top: 5%">
+        <strong>Weekly Summary</strong>
       </div>
       <div class="item2-week">
-        <button id="popup" onclick="div_show()" class="task-btn" style="width: 44%">
+        <button id="popup" onclick="div_show()" class="task-btn" style="width: 100%">
           Create task
         </button>    
         <div id="abc">
@@ -52,9 +52,9 @@
               </a>
             </form>
           </div> <!-- Popup div ends here -->
-        </div>      	
-        <div style="float: right">
-          <button id="popup" onclick="div_show2()" class="task-btn">
+        </div>
+        <div>      	
+          <button id="popup" onclick="div_show2()" class="task-btn" style="width: 100%; margin-top: 1%">
             Update available time
           </button>      
           <div id="abc2">
@@ -87,9 +87,9 @@
         </div>  
       </div>
       <div class="item3-week">
-      	<div style="float: right">
-      		<button id="btnUpdate" onclick="update()" class="update-btn">Update summary</button>
-      	</div>
+        <button id="btnUpdate" onclick="update()" class="update-btn" style="width: 100%; height: 100%">
+          Update summary            
+        </button>
       </div>      
       <div class="item4">
 
@@ -118,7 +118,7 @@
   </div>
   <% for(var i = 0; i < Object.keys(days).length; i++) { %>
     <div class="grid-container">
-      <div class="item1">
+      <div class="item1" style="padding-top: 2%; padding-bottom: 2%">
         <strong><%= days[i + 1].name %></strong>
       </div>
       <div class="item2">

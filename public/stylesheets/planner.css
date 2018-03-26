@@ -63,14 +63,14 @@
 
 .item1 {
     text-align: center;
+    color: rgb(15, 15, 139);
     /* font-family: "Century Gothic"; */
     /* font-family: Tahoma; */
-    color: rgb(15, 15, 139);
     /* font-family: Georgia */
     /* font-family: 'Courier New', Courier, monospace; */
-    /* font-family: Consolas, monospace; */
+    font-family: Consolas, monospace;
     /* font-family: "Trebuchet MS"; */
-    font-family: "Lucida Sans";
+    /* font-family: "Lucida Sans"; */
 }
 
 .item2 {
