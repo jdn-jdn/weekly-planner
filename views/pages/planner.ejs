@@ -134,8 +134,9 @@
         <% for(var j = 0; j < daysAndTasks.length; j++) { %>
           <% if (daysAndTasks[j].day_id == i + 1 && daysAndTasks[j].task_id != null) { %>
             <div style="padding-bottom: 1%; padding-top: 1%; border-bottom: 1px dotted black">
-              <strong>Class</strong>: <%= daysAndTasks[j].class %>                           </br> 
-              <strong>Task</strong>: <%= daysAndTasks[j].description %>                      </br>
+              <strong>Class</strong>: <%= daysAndTasks[j].class %>                           <br/> 
+              <strong>Task</strong>: <%= daysAndTasks[j].description %>                      <br/>
+              <br/>
               <strong>Due time</strong>: 
               <% if (daysAndTasks[j].due_time.split(':')[0] < 12) { %>
                 <%= daysAndTasks[j].due_time.split(':')[0] + ":" + daysAndTasks[j].due_time.split(':')[1] + " AM" %>
