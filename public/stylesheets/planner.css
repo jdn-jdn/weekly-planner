@@ -57,6 +57,17 @@
     max-width: 0%;
 }
 
+.hr-week { 
+    display: block;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: dashed;
+    border-width: 0.75%;
+    max-width: 59%;
+} 
+
 .item3-week {
     /*max-width: 33%;*/
 }
