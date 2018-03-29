@@ -9,11 +9,6 @@
   </title>
   <link href="./../../public/stylesheets/planner.css" rel="stylesheet" type="text/css"/>
   <script src="./../../public/scripts/main.js"></script>
-  <script 
-    src="https://code.jquery.com/jquery-3.2.1.min.js" 
-    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" 
-    crossorigin="anonymous">
-  </script>
 </head>
 <body>
   <div class="a">
@@ -22,7 +17,7 @@
         <strong>Weekly Summary</strong>
       </div>
       <div class="item2-week">
-        <button id="popup" onclick="div_show()" class="task-btn">
+        <button id="popup" onclick="div_show()" class="task-btn" style="width: 97%; margin-top: 1%; margin-right: 0%; margin-left: 2%;">
           Create task
         </button>    
         <div id="abc">
@@ -45,7 +40,6 @@
               </select>
               <input id="course" name="course" placeholder="Class" type="text">
               <textarea id="description" name="description" placeholder="Task description"></textarea>
-              <br>
               Due time:
               <br>
               <input id="due" name="due" type="time"> 
@@ -56,14 +50,14 @@
               <input id="work_time" name="work_time" type="number" step="0.5" min="0" max="24"> 
               <br> 
               <br>
-              <a href="javascript:%20check_empty()" id="submit" class="submit">
+              <a href="javascript:%20check_empty()" id="submit">
                 Create task
               </a>
             </form>
           </div> <!-- Popup div ends here -->
         </div>
         <div>      	
-          <button id="popup" onclick="div_show2()" class="task-btn">
+          <button id="popup" onclick="div_show2()" class="task-btn" style="width: 97%; margin-top: 1%; margin-right: 0%; margin-left: 2%;">
             Update available time
           </button>      
           <div id="abc2">
@@ -90,7 +84,7 @@
                 <br/>
                 <input id="available_time" name="available_time" type="number" step="0.5" min="0" max="24"> 
                 <br/><br/>
-                <a href="javascript:%20check_empty2()" id="submit" class="submit2">
+                <a href="javascript:%20check_empty2()" id="submit">
                   Update available time
                 </a>
               </form>
@@ -99,11 +93,8 @@
         </div>  
       </div>
       <div class="item3-week" style="margin-right: 2%; margin-left: 2%;">
-        <button id="btnUpdate" onclick="update()" class="update-btn">
+        <button id="btnUpdate" onclick="update()" class="update-btn" style="width: 100%; height: 100%;">
           Update summary            
-        </button>
-        <button id="btnLogout" onclick="logout();" class="logout-btn">
-          Log Out           
         </button>
       </div>      
       <div class="item4">

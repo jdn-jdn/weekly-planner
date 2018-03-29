@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>
+        Log In
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./../../public/stylesheets/login.css" rel="stylesheet" type="text/css"/>
+    <script src="./../../public/scripts/main.js"></script>
+    <script 
+        src="https://code.jquery.com/jquery-3.2.1.min.js" 
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" 
+        crossorigin="anonymous">
+    </script>
+</head>
+<body onload="div_show()">
+    <div class="a">
+        <div id="abc">
+            <div id="popupContact"> <!-- Popup div starts here -->
+                <div id="form" name="form" class="form">
+                    <h2 style="color: rgb(15, 15, 139); font-family: Consolas, monospace;">
+                        Log In
+                    </h2>
+                    <hr>
+                    <!-- <input id="course" name="course" placeholder="username" type="text"> -->
+                    <!-- <input id="course" name="course" placeholder="password" type="text"> -->
+                    <input type="text" id="username" placeholder="username">
+                    <input type="password" id="password" placeholder="password">
+                    <br> 
+                    <br>
+                    <!-- <a href="javascript:%20check_empty()" id="submit">
+                        Create task
+                    </a> -->
+                    <!-- <button class="logInBtn" onclick="login();">Log in</button> -->
+                    <!-- <button class="signUpBtn" onclick="signup();">Sign up</button><br> -->
+                    <button class="submit" onclick="login();">Log in</button>
+                    <button class="submit" onclick="signup();">Sign up</button><br>
+                </div>
+            </div> <!-- Popup div ends here -->
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        // Validating empty fields
+        function check_empty() {
+            if (document.getElementById('course').value == "" || document.getElementById('description').value == "" || 
+                document.getElementById('due').value    == "" || document.getElementById('work_time').value   == "" ||
+                document.getElementById('day_id').value == "None") {
+            alert("Please fill all fields before submitting");
+            } else {
+            document.getElementById('form').submit();
+            }
+        }
+    
+        // Displaying popup
+        function div_show() {
+            document.getElementById('abc').style.display = "block";
+        }
+    
+        //Hiding popup
+        function div_hide(){
+            document.getElementById('abc').style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div> -->
+        <!-- <div id="popupContact"> Popup div starts here -->
+        <!-- <div> Popup div starts here -->
+            <!-- <form> Task creation form -->
+                <!-- <h2 style="color: rgb(15, 15, 139); font-family: Consolas, monospace;"> -->
+                    <!-- Log In -->
+                <!-- </h2> -->
+
+            
+            <!-- <div> -->
+                <!-- <input type="text" id="username" placeholder="username"><br><br> -->
+                <!-- <input type="password" id="password" placeholder="password"><br><br> -->
+                <!-- <button class="loginpageBtn" onclick="login();">Log in</button> -->
+                <!-- <button class="loginpageBtn" onclick="signup();">Sign up</button><br> -->
+            <!-- </div>     -->
+
+
+            <!-- </form> -->
+        <!-- </div> -->
+    <!-- </div> -->

@@ -55,3 +55,39 @@ function updatePage(results) {
         document.getElementById("week-total-time").innerHTML = weekTotalTime;
     }
 }
+
+function login() {
+    console.log('Logging in...');
+	var username = $("#username").val();
+    var password = $("#password").val();
+    
+    console.log('Username is ' + username);
+    console.log('Password is ' + password);
+
+	var params = {
+		username: username,
+		password: password
+	};
+
+	$.post("/login", params, function(result) {
+        console.log("result: " + result);
+		if (result && result.success) {
+            console.log("Successfully logged in.");
+            window.location.replace("/");
+		} else {
+			console.log("Error logging in.");
+		}
+	});
+}
+
+function logout() {
+    console.log('Logging out...');
+	$.post("/logout", function(result) {
+		if (result && result.success) {
+			console.log("Successfully logged out.");
+            window.location.replace("/");
+		} else {
+			console.log("Error logging out.");
+		}
+	});
+}

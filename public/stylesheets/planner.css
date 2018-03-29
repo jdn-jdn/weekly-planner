@@ -29,22 +29,67 @@
 }
 
 .remove-btn {
-    background: -webkit-linear-gradient(top, #DD4B39, #D14836); 
-    background: -moz-linear-gradient(top, #DD4B39, #D14836); 
-    background: -ms-linear-gradient(top, #DD4B39, #D14836); 
-    border: 1px solid #DD4B39;
+    background: -webkit-linear-gradient(top, rgb(255, 136, 0), rgb(255, 136, 0)); 
+    background: -moz-linear-gradient(top, rgb(255, 136, 0), rgb(255, 136, 0)); 
+    background: -ms-linear-gradient(top, rgb(255, 136, 0), rgb(255, 136, 0)); 
+    /* background: -webkit-linear-gradient(top, rgb(255, 0, 0), rgb(255, 0, 0)); 
+    background: -moz-linear-gradient(top, rgb(255, 0, 0), rgb(255, 0, 0)); 
+    background: -ms-linear-gradient(top, rgb(255, 0, 0), rgb(255, 0, 0));      */
+    /* border: 1px solid rgb(255, 0, 0); */
+    border: 1px solid rgb(255, 136, 0);
     color: white;
-    text-shadow: 0 1px 0 #C04131;
+    text-shadow: 0 1px 0 rgb(255, 136, 0);
+    /* text-shadow: 0 1px 0 rgb(255, 0, 0); */
     cursor:pointer;
 }
 
 .update-btn {
+    margin-top: 1%; 
+    margin-right: 0%; 
+    margin-left: 18%;
+    max-width: 65%;
+    width: 65%;
     background: -webkit-linear-gradient(top, rgb(0, 156, 78), rgb(0, 156, 78)); 
     background: -moz-linear-gradient(top, rgb(0, 156, 78), rgb(0, 156, 78)); 
     background: -ms-linear-gradient(top, rgb(0, 156, 78), rgb(0, 156, 78)); 
     border: 1px solid rgb(0, 156, 78);
     color: white;
     text-shadow: 0 1px 0 rgb(0, 156, 78);
+    cursor:pointer;
+}
+
+.task-btn {
+    margin-top: 1%; 
+    margin-right: 0%; 
+    margin-left: 18%;
+    max-width: 65%;
+    width: 65%;
+    background: -webkit-linear-gradient(top, rgb(15, 15, 139), rgb(15, 15, 139)); 
+    background: -moz-linear-gradient(top, rgb(15, 15, 139), rgb(15, 15, 139)); 
+    background: -ms-linear-gradient(top, rgb(15, 15, 139), rgb(15, 15, 139)); 
+    border: 1px solid rgb(15, 15, 139);
+    color: white;
+    text-shadow: 0 1px 0 rgb(15, 15, 139);
+    cursor:pointer;
+}
+
+.logout-btn {
+    margin-top: 1%; 
+    margin-right: 0%; 
+    margin-left: 18%;
+    max-width: 65%;
+    width: 65%;
+    background: -webkit-linear-gradient(top, rgb(255, 0, 0), rgb(255, 0, 0)); 
+    background: -moz-linear-gradient(top, rgb(255, 0, 0), rgb(255, 0, 0)); 
+    background: -ms-linear-gradient(top, rgb(255, 0, 0), rgb(255, 0, 0));     
+    /* background: -webkit-linear-gradient(top, rgb(255, 136, 0), rgb(255, 136, 0)); 
+    background: -moz-linear-gradient(top, rgb(255, 136, 0), rgb(255, 136, 0)); 
+    background: -ms-linear-gradient(top, rgb(255, 136, 0), rgb(255, 136, 0));  */
+    border: 1px solid rgb(255, 0, 0);
+    /* border: 1px solid rgb(255, 136, 0); */
+    color: white;
+    text-shadow: 0 1px 0 rgb(255, 0, 0);
+    /* text-shadow: 0 1px 0 rgb(255, 136, 0); */
     cursor:pointer;
 }
 
@@ -172,13 +217,13 @@ hr {
 }
 
 input[type=text] {
-    width:82%;
+    width:92%;
     padding:10px;
     margin-top:30px;
     border:1px solid #ccc;
-    padding-left:40px;
+    /* padding-left:40px; */
     font-size:16px;
-    font-family:raleway;
+    font-family: Calibri;
 }
 
 #course {
@@ -191,30 +236,40 @@ textarea {
     background-image:url(../images/msg.png);
     background-repeat:no-repeat;
     background-position:5px 7px;
-    width:82%;
+    width:92%;
     height:95px;
     padding:10px;
     resize:none;
     margin-top:30px;
     border:1px solid #ccc;
-    padding-left:40px;
+    /* padding-left:40px; */
     font-size:16px;
-    font-family:raleway;
+    font-family: Calibri;
     margin-bottom:30px;
 }
 
-#submit {
+.submit, .submit2 {
     text-decoration:none;
-    width:100%;
     text-align:center;
     display:block;
     background-color:rgb(15, 15, 139);
     color:#fff;
-    padding:10px 0;
+    padding:1% 0;
+    margin:1% 0;
     font-size:20px;
     cursor:pointer;
     border-radius:5px;
     font-family: Calibri;
+}
+
+.submit {
+    margin-left: 25%;
+    max-width: 50%;
+}
+
+.submit2 {
+    margin-left: 2%;
+    max-width: 100%;
 }
 
 span {
@@ -230,5 +285,6 @@ button {
     color: white;
     text-shadow: 0 1px 0 rgb(15, 15, 139);
     cursor:pointer;
-    border-radius: 7px;
+    border-radius: 3px;
+    margin-bottom: 0.5%;
 }

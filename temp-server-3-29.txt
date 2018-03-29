@@ -5,41 +5,18 @@ const app = express();
 const bodyParser = require('body-parser');
 const pg = require("pg");
 const connectionString = process.env.DATABASE_URL || "postgres://test_user:password@localhost:5432/weekly_planner";
-const session = require('express-session');
-
-app.set('views', path.join(__dirname, '/views'));
-app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, '/public')));
 app.use("/public/stylesheets", express.static(__dirname + "/public/stylesheets"));
 app.use("/public/scripts", express.static(__dirname + "/public/scripts"));
-app.use(session({
-	secret: 'my-super-secret-secret!',
-	resave: false,
-	saveUninitialized: true
-	})
-);
 
-// app.use('/', function handleLogin(req, res, next) {
-// 	if (!req.session.user) {
-// 		console.log('No session available...');
-// 		res.render('pages/login');
-// 	}
-// 
-// 	next();
-// });
+app.set('views', path.join(__dirname, '/views'));
+app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
-	console.log('Received get request...');
-	if (!req.session.user) {
-		console.log('No session active...');
-		res.render('pages/login');
-	} else if (req.session.user) {
-		console.log('Session is active...');
-		getDaysAndTasks(req, res);
-	}
+	getDaysAndTasks(req, res);
 });
 
 app.get('/weeklyUpdate', function (req, res) {
@@ -57,40 +34,9 @@ app.post('/', function(req, res) {
 	}
 });
 
-app.post('/login', function handleLogin(req, res) {
-	var result = {success: false};
-
-	// We should do better error checking here to make sure the parameters are present
-	if (req.body.username == "admin" && req.body.password == "password") {
-		req.session.user = req.body.username;
-		result = {success: true};	
-	}
-
-	res.json(result);
-});
-
-app.post('/logout', function handleLogout(request, response) {
-	var result = {success: false};
-
-	// We should do better error checking here to make sure the parameters are present
-	if (request.session.user) {
-		request.session.destroy();
-		console.log('Destroyed session...');
-		console.log('Setting result.success: true...');
-		result = {success: true};
-	}
-
-	console.log('Sending json(result) response...');
-	response.json(result);
-});
-
-
-
 app.listen(PORT, function() { 
 	console.log(`Listening on port ${ PORT }`);
 });
-
-
 
 function getWeeklyUpdate(request, response) {
 	// Using a helper function to query DB and provide callback after processing
