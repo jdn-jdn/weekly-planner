@@ -25,59 +25,40 @@
                         Log In
                     </h2>
                     <hr>
-                    <!-- <input id="course" name="course" placeholder="username" type="text"> -->
-                    <!-- <input id="course" name="course" placeholder="password" type="text"> -->
                     <input type="text" id="username" placeholder="username">
                     <input type="password" id="password" placeholder="password">
-                    <br> 
-                    <br>
-                    <!-- <a href="javascript:%20check_empty()" id="submit">
-                        Create task
-                    </a> -->
-                    <!-- <button class="logInBtn" onclick="login();">Log in</button> -->
-                    <!-- <button class="signUpBtn" onclick="signup();">Sign up</button><br> -->
-                    <button class="submit" onclick="login();">Log in</button>
-                    <button class="submit" onclick="signup();">Sign up</button><br>
+                    <br/> <br/>
+                    <button class="submit" onclick="check_empty();">Log in</button>
+                    <button class="submit" onclick="check_empty2();">Sign up</button>
+                    <br/>
                 </div>
             </div> <!-- Popup div ends here -->
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <script>
-        // Validating empty fields
-        function check_empty() {
-            if (document.getElementById('course').value == "" || document.getElementById('description').value == "" || 
-                document.getElementById('due').value    == "" || document.getElementById('work_time').value   == "" ||
-                document.getElementById('day_id').value == "None") {
-            alert("Please fill all fields before submitting");
-            } else {
-            document.getElementById('form').submit();
-            }
-        }
-    
+    <script>    
         // Displaying popup
         function div_show() {
             document.getElementById('abc').style.display = "block";
         }
-    
-        //Hiding popup
-        function div_hide(){
-            document.getElementById('abc').style.display = "none";
+        
+        // Validating empty fields
+        function check_empty() {
+            if (document.getElementById('username').value == "" || document.getElementById('password').value == "") {
+                alert("Please fill all fields before submitting");
+            } else {
+                login();
+            }
+        }
+        
+        // Validating empty fields
+        function check_empty2() {
+            if (document.getElementById('username').value == "" || document.getElementById('password').value == "") {
+                alert("Please fill all fields before submitting");
+            } else {
+                signup();
+            }
         }
     </script>
-
 </body>
 </html>
 

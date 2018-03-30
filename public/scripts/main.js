@@ -58,9 +58,6 @@ function login() {
     console.log('Logging in...');
 	var username = $("#username").val();
     var password = $("#password").val();
-    
-    console.log('Username is ' + username);
-    console.log('Password is ' + password);
 
 	var params = {
 		username: username,
@@ -74,6 +71,30 @@ function login() {
             window.location.replace("/");
 		} else {
 			console.log("Error logging in.");
+			alert("Error logging in");
+		}
+	});
+}
+
+function signup() {
+    console.log('SIgning up...');
+	var username = $("#username").val();
+    var password = $("#password").val();
+    
+	var params = {
+		username: username,
+		password: password
+	};
+
+	$.post("/signup", params, function(result) {
+        console.log("result: " + JSON.stringify(result));
+		if (result && result.success) {
+            console.log("Successfully signed up.");
+            alert("Successfully signed up. Welcome aboard!");
+            window.location.replace("/");
+		} else {
+			console.log("Error signing up.");
+			alert("Error signing up");
 		}
 	});
 }

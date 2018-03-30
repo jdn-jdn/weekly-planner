@@ -22,19 +22,7 @@ app.use(session({
 	})
 );
 
-app.get('/', handleGet);
-app.get('/weeklyUpdate', getWeeklyUpdate);
-
-app.post('/', handlePost);
-app.post('/login', handleLogin);
-app.post('/signup', handleSignup);
-app.post('/logout', handleLogout);
-
-app.listen(PORT, function() { 
-	console.log(`Listening on port ${ PORT }`);
-});
-
-function handleGet(req, res) {
+app.get('/', function(req, res) {
 	console.log('Received get request...');
 	if (!req.session.user) {
 		console.log('No session active...');
@@ -43,54 +31,24 @@ function handleGet(req, res) {
 		console.log('Session is active...');
 		getDaysAndTasks(req, res);
 	}
-}
+});
 
-function handlePost(req, res) {
-	console.log('Received post request...');
+app.get('/weeklyUpdate', function (req, res) {
+	console.log('Got a request for an update...');
+	getWeeklyUpdate(req, res);
+});
+
+app.post('/', function(req, res) {
 	if (req.body.available_time != null) {
-		console.log('Updating available time...');
 		updateAvailableTime(req, res);
 	} else if (req.body.task_id != null) {
-		console.log('Deleting a task...');
 		deleteTask(req, res);
 	} else {
-		console.log('Creating a task...');
 		createNewTask(req, res);
 	}
-}
+});
 
-function handleLogout(request, response) {
-	var result = {success: false};
-	if (request.session.user) {
-		request.session.destroy();
-		console.log('Destroyed session...');
-		result = {success: true};
-	}
-	console.log('Sending json(result) response...');
-	response.json(result);
-}
-
-function handleSignup(req, res) {
-	// Using a helper function to query DB and provide callback after processing
-	getUserCredsFromDbSignup(req, res, function(error, dbResult) {
-		// Callback function that will be called when the DB done
-		if (error || dbResult == null) {
-			res.status(500).json({success: false, data: error});
-		} else {
-			var result = {success: false};
-			if (dbResult.length === 0) {
-				// Username doesn't already exist
-				result = {success: true};
-				createNewUser(req.body.username, req.body.password, function (error, dbNewUserResult) {
-					console.log("Successfully created new user...");
-				});
-			}
-			res.json(result);
-		}
-	});
-}
-
-function handleLogin(req, res) {
+app.post('/login', function handleLogin(req, res) {
 	// Using a helper function to query DB and provide callback after processing
 	getUserCredsFromDb(req, res, function(error, dbResult) {
 		// Callback function that will be called when the DB done
@@ -101,6 +59,10 @@ function handleLogin(req, res) {
 			var username = dbResult[0]["username"];
 			var password = dbResult[0]["password"];
 			var result = {success: false};
+
+			console.log("username form db: " + username);
+			console.log("password form db: " + password);
+
 			if (req.body.username == username && req.body.password == password) {
 				req.session.user = userId;
 				result = {
@@ -108,10 +70,54 @@ function handleLogin(req, res) {
 					data: dbResult
 				};
 			}
+
 			res.json(result);
 		}
 	});
-}
+});
+
+app.post('/signup', function handleSignup(req, res) {
+	// Using a helper function to query DB and provide callback after processing
+	getUserCredsFromDbSignup(req, res, function(error, dbResult) {
+		// Callback function that will be called when the DB done
+		if (error || dbResult == null) {
+			res.status(500).json({success: false, data: error});
+		} else {
+			var result = {success: false};
+
+			if (dbResult.length === 0) {
+				// Username doesn't already exist
+				result = {
+					success: true
+				};
+				createNewUser(req.body.username, req.body.password, function (error, dbNewUserResult) {
+					console.log("Successfully created new user...");
+				});
+			}
+
+			res.json(result);
+		}
+	});
+});
+
+app.post('/logout', function handleLogout(request, response) {
+	var result = {success: false};
+
+	// We should do better error checking here to make sure the parameters are present
+	if (request.session.user) {
+		request.session.destroy();
+		console.log('Destroyed session...');
+		console.log('Setting result.success: true...');
+		result = {success: true};
+	}
+
+	console.log('Sending json(result) response...');
+	response.json(result);
+});
+
+app.listen(PORT, function() { 
+	console.log(`Listening on port ${ PORT }`);
+});
 
 function createNewUser(username, password, callback) {
 	console.log("Inserting new user into DB...");
@@ -270,14 +276,13 @@ function getUserCredsFromDbSignup(req, res, callback) {
 }
 
 function getWeeklyUpdate(request, response) {
-	console.log('Got a request for a weekly update...');
 	// Using a helper function to query DB and provide callback after processing
 	getWeeklyUpdateFromDb(request.session.user, function(error, result) {
 		// Callback function that will be called when the DB done
 		if (error || result == null) {
 			response.status(500).json({success: false, data: error});
 		} else {
-			console.log("Received results from database...");
+			console.log("Received results from database: " + result);
 			response.json(result);
 		}
 	});
@@ -350,7 +355,7 @@ function getDaysAndTasks(request, response) {
 }
 
 function getDaysAndTasksFromDb(userId, callback) {
-	console.log("Getting days from DB...");
+	console.log("Getting days from DB");
 
 	var client = new pg.Client(connectionString);
 
@@ -387,6 +392,7 @@ function getDaysAndTasksFromDb(userId, callback) {
 				console.log(err);
 				callback(err, null);
 			}
+			console.log("TEST FOR RESULT: " + JSON.stringify(result.rows))
 			// Giving results to callback
 			callback(null, result.rows);
 		});

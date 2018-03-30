@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const pg = require("pg");
-const connectionString = process.env.DATABASE_URL || "postgres://postgres:password@localhost:5432/weekly_planner";
+const connectionString = process.env.DATABASE_URL || "postgres://test_user:password@localhost:5432/weekly_planner";
 const session = require('express-session');
 
 app.set('views', path.join(__dirname, '/views'));
@@ -16,25 +16,13 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use("/public/stylesheets", express.static(__dirname + "/public/stylesheets"));
 app.use("/public/scripts", express.static(__dirname + "/public/scripts"));
 app.use(session({
-	secret: 'secret',
+	secret: 'my-super-secret-secret!',
 	resave: false,
 	saveUninitialized: true
 	})
 );
 
-app.get('/', handleGet);
-app.get('/weeklyUpdate', getWeeklyUpdate);
-
-app.post('/', handlePost);
-app.post('/login', handleLogin);
-app.post('/signup', handleSignup);
-app.post('/logout', handleLogout);
-
-app.listen(PORT, function() { 
-	console.log(`Listening on port ${ PORT }`);
-});
-
-function handleGet(req, res) {
+app.get('/', function(req, res) {
 	console.log('Received get request...');
 	if (!req.session.user) {
 		console.log('No session active...');
@@ -43,54 +31,24 @@ function handleGet(req, res) {
 		console.log('Session is active...');
 		getDaysAndTasks(req, res);
 	}
-}
+});
 
-function handlePost(req, res) {
-	console.log('Received post request...');
+app.get('/weeklyUpdate', function (req, res) {
+	console.log('Got a request for an update...');
+	getWeeklyUpdate(req, res);
+});
+
+app.post('/', function(req, res) {
 	if (req.body.available_time != null) {
-		console.log('Updating available time...');
 		updateAvailableTime(req, res);
 	} else if (req.body.task_id != null) {
-		console.log('Deleting a task...');
 		deleteTask(req, res);
 	} else {
-		console.log('Creating a task...');
 		createNewTask(req, res);
 	}
-}
+});
 
-function handleLogout(request, response) {
-	var result = {success: false};
-	if (request.session.user) {
-		request.session.destroy();
-		console.log('Destroyed session...');
-		result = {success: true};
-	}
-	console.log('Sending json(result) response...');
-	response.json(result);
-}
-
-function handleSignup(req, res) {
-	// Using a helper function to query DB and provide callback after processing
-	getUserCredsFromDbSignup(req, res, function(error, dbResult) {
-		// Callback function that will be called when the DB done
-		if (error || dbResult == null) {
-			res.status(500).json({success: false, data: error});
-		} else {
-			var result = {success: false};
-			if (dbResult.length === 0) {
-				// Username doesn't already exist
-				result = {success: true};
-				createNewUser(req.body.username, req.body.password, function (error, dbNewUserResult) {
-					console.log("Successfully created new user...");
-				});
-			}
-			res.json(result);
-		}
-	});
-}
-
-function handleLogin(req, res) {
+app.post('/login', function handleLogin(req, res) {
 	// Using a helper function to query DB and provide callback after processing
 	getUserCredsFromDb(req, res, function(error, dbResult) {
 		// Callback function that will be called when the DB done
@@ -101,6 +59,10 @@ function handleLogin(req, res) {
 			var username = dbResult[0]["username"];
 			var password = dbResult[0]["password"];
 			var result = {success: false};
+
+			console.log("username form db: " + username);
+			console.log("password form db: " + password);
+
 			if (req.body.username == username && req.body.password == password) {
 				req.session.user = userId;
 				result = {
@@ -108,94 +70,59 @@ function handleLogin(req, res) {
 					data: dbResult
 				};
 			}
+
 			res.json(result);
 		}
 	});
-}
+});
 
-function createNewUser(username, password, callback) {
-	console.log("Inserting new user into DB...");
+app.post('/signup', function handleSignup(req, res) {
+	// Using a helper function to query DB and provide callback after processing
+	getUserCredsFromDb(req, res, function(error, dbResult) {
+		// Callback function that will be called when the DB done
+		if (error || dbResult == null) {
+			res.status(500).json({success: false, data: error});
+		} else {
+			// var userId   = dbResult[0]["planner_id"];
+			var username = dbResult[0]["username"];
+			var password = dbResult[0]["password"];
+			var result = {success: false};
 
-	var client = new pg.Client(connectionString);
+			console.log("username form db: " + username);
+			console.log("password form db: " + password);
 
-	client.connect(function(err) {
-		if (err) {
-			console.log("Error connecting to DB: ")
-			console.log(err);
-			callback(err, null);
-		}
-		
-		var sql = "";
-
-		var sqlCreate = "CREATE USER "     + 
-		                username           + 
-						" WITH PASSWORD '" + 
-						password           + 
-						"'";
-
-		var sqlGrant1 = "GRANT SELECT, INSERT, UPDATE, DELETE "  + 
-						"ON planner, day, task, task_day, week " + 
-						"TO "                                    + 
-						username;
-
-		var sqlGrant2 = "GRANT USAGE, SELECT "                                                   +
-						"ON SEQUENCE planner_planner_id_seq, day_day_id_seq, task_task_id_seq, " +
-						"task_day_task_day_id_seq, week_week_id_seq "                            +
-						"TO "                                                                    + 
-						username;
-
-		var sqlInsertPlanner = "INSERT INTO planner " +
-					           "("                    +
-					             "username"           +
-					           ", password"           +
-					           ") "                   +
-					           "VALUES "              +
-					           "("                    +
-					           "'"  + username + "'"  +
-					           ",'" + password + "'"  +
-					           ")";
-						
-						"INSERT INTO day (name, planner_id) VALUES ('Monday', "    + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Wednesday', " + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Thursday', "  + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Friday', "    + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + "1)";
-
-		var sqlGetIdSubQuery = "(SELECT planner_id FROM planner WHERE username = '" + 
-		                       username + 
-							   "' AND password = '" + 
-							   password + 
-							   "')";
-
-		var sqlInsertDays = "INSERT INTO day (name, planner_id) VALUES ('Monday', "    + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Wednesday', " + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Thursday', "  + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Friday', "    + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + sqlGetIdSubQuery + ")";
-
-		sql = sqlCreate + ";"+ sqlGrant1 + ";"+ sqlGrant2 + ";"+ sqlInsertPlanner + ";" + sqlInsertDays;
-
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-			});
-
-			if (err) {
-				console.log("Error in query: ")
-				console.log(err);
-				callback(err, null);
+			if (!(req.body.username == username && req.body.password == password)) {
+				// Username and password doesn't already exist
+				req.session.user = userId;
+				result = {
+					success: true,
+					data: dbResult
+				};
 			}
 
-			// Giving results to callback
-			callback(null, result.rows);
-		});
+			res.json(result);
+		}
 	});
-}
+});
+
+app.post('/logout', function handleLogout(request, response) {
+	var result = {success: false};
+
+	// We should do better error checking here to make sure the parameters are present
+	if (request.session.user) {
+		request.session.destroy();
+		console.log('Destroyed session...');
+		console.log('Setting result.success: true...');
+		result = {success: true};
+	}
+
+	console.log('Sending json(result) response...');
+	response.json(result);
+});
+
+app.listen(PORT, function() { 
+	console.log(`Listening on port ${ PORT }`);
+});
 
 function getUserCredsFromDb(req, res, callback) {
 	console.log("Getting user credentials from DB...");
@@ -233,51 +160,14 @@ function getUserCredsFromDb(req, res, callback) {
 	});
 }
 
-function getUserCredsFromDbSignup(req, res, callback) {
-	console.log("Getting user credentials from DB...");
-
-	var client = new pg.Client(connectionString);
-
-	client.connect(function(err) {
-		if (err) {
-			console.log("Error connecting to DB: ")
-			console.log(err);
-			callback(err, null);
-		}
-
-		var sql =  "SELECT username "   +
-				   "FROM planner "      +
-				   "WHERE username = '" + 
-				   req.body.username    +
-				   "'";
-
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-			});
-
-			if (err) {
-				console.log("Error in query: ")
-				console.log(err);
-				callback(err, null);
-			}
-
-			// Giving results to callback
-			callback(null, result.rows);
-		});
-	});
-}
-
 function getWeeklyUpdate(request, response) {
-	console.log('Got a request for a weekly update...');
 	// Using a helper function to query DB and provide callback after processing
 	getWeeklyUpdateFromDb(request.session.user, function(error, result) {
 		// Callback function that will be called when the DB done
 		if (error || result == null) {
 			response.status(500).json({success: false, data: error});
 		} else {
-			console.log("Received results from database...");
+			console.log("Received results from database: " + result);
 			response.json(result);
 		}
 	});
@@ -336,6 +226,7 @@ function getDaysAndTasks(request, response) {
 
 			for (const index in result) {
 				var dayId = ((parseInt(result[index].day_id) - 1) % 7 + 1);
+				console.log("dayId:" + dayId);
 				days[dayId]["name"]                     = result[index].name;
 				days[dayId]["total_available_time_day"] = result[index].total_available_time_day;
 				days[dayId]["total_work_time_day"]      = result[index].total_work_time_day;
@@ -350,7 +241,7 @@ function getDaysAndTasks(request, response) {
 }
 
 function getDaysAndTasksFromDb(userId, callback) {
-	console.log("Getting days from DB...");
+	console.log("Getting days from DB");
 
 	var client = new pg.Client(connectionString);
 
@@ -387,6 +278,7 @@ function getDaysAndTasksFromDb(userId, callback) {
 				console.log(err);
 				callback(err, null);
 			}
+			console.log("TEST FOR RESULT: " + JSON.stringify(result.rows))
 			// Giving results to callback
 			callback(null, result.rows);
 		});
