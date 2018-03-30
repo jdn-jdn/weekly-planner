@@ -172,13 +172,21 @@
       <div class="item5">
         <strong>Estimated work time</strong>:
         <div style="float: right" class="time-value">
-          <%= days[i + 1].total_work_time_day %>
+          <% if (days[i + 1].total_work_time_day == 0) { %>
+            0
+          <% } else { %>
+            <%= days[i + 1].total_work_time_day %>
+          <% } %>
         </div>
       </div>
       <div class="item6">
         <strong>Estimated available time</strong>:
         <div style="float: right" class="time-value">
-          <%= days[i + 1].total_available_time_day %>
+          <% if (days[i + 1].total_available_time_day == 0) { %>
+            0
+          <% } else { %>
+            <%= days[i + 1].total_available_time_day %>
+          <% } %>
         </div>
       </div>
       <div class="item7">

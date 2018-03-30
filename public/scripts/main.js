@@ -27,13 +27,13 @@ function updatePage(results) {
     console.log("Updating the divs with these results: " + results);
     var week = JSON.parse(results);
 
-    var weekWorkTime      = 0;
-    var weekAvailableTime = 0;
-    var weekTotalTime     = 0;
+    var weekWorkTime      = 0.0;
+    var weekAvailableTime = 0.0;
+    var weekTotalTime     = 0.0;
 
     for (var day in week) {
-        weekWorkTime      += parseInt(week[day]["total_work_time_day"]);
-        weekAvailableTime += parseInt(week[day]["total_available_time_day"]);
+        weekWorkTime      += parseFloat(week[day]["total_work_time_day"]);
+        weekAvailableTime += parseFloat(week[day]["total_available_time_day"]);
     }
 
     weekTotalTime = weekAvailableTime - weekWorkTime;
@@ -43,9 +43,7 @@ function updatePage(results) {
     console.log(weekTotalTime);
     
     document.getElementById("week-work-time").innerHTML = weekWorkTime;
-
     document.getElementById("week-available-time").innerHTML = weekAvailableTime;
-
     if (weekTotalTime > 0) {
         document.getElementById("week-total-time").innerHTML = "<span style='color: green'>+" + weekTotalTime + "</span>";                
     }

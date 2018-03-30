@@ -22,15 +22,6 @@ app.use(session({
 	})
 );
 
-// app.use('/', function handleLogin(req, res, next) {
-// 	if (!req.session.user) {
-// 		console.log('No session available...');
-// 		res.render('pages/login');
-// 	}
-// 
-// 	next();
-// });
-
 app.get('/', function(req, res) {
 	console.log('Received get request...');
 	if (!req.session.user) {
@@ -58,10 +49,8 @@ app.post('/', function(req, res) {
 });
 
 app.post('/login', function handleLogin(req, res) {
-
 	// Using a helper function to query DB and provide callback after processing
 	getUserCredsFromDb(req, res, function(error, dbResult) {
-		console.log("TEST!!!!!" + dbResult);
 		// Callback function that will be called when the DB done
 		if (error || dbResult == null) {
 			res.status(500).json({success: false, data: error});
@@ -82,20 +71,10 @@ app.post('/login', function handleLogin(req, res) {
 					data: dbResult
 				};
 			}
-
+			
 			res.json(result);
 		}
 	});
-
-	// var result = {success: false};
-
-	// // We should do better error checking here to make sure the parameters are present
-	// if (req.body.username == "admin" && req.body.password == "password") {
-	// 	req.session.user = req.body.username;
-	// 	result = {success: true};
-	// }
-
-	// res.json(result);
 });
 
 app.post('/logout', function handleLogout(request, response) {
@@ -117,10 +96,6 @@ app.listen(PORT, function() {
 	console.log(`Listening on port ${ PORT }`);
 });
 
-
-
-
-
 function getUserCredsFromDb(req, res, callback) {
 	console.log("Getting user credentials from DB...");
 
@@ -133,10 +108,10 @@ function getUserCredsFromDb(req, res, callback) {
 			callback(err, null);
 		}
 
-		var sql =  "SELECT planner_id, username, password "   +
-				   "FROM planner "                            +
-				   "WHERE username = '"  + req.body.username  + 
-				   "' AND password = '"   + req.body.password + 
+		var sql =  "SELECT planner_id, username, password " +
+				   "FROM planner "                          +
+				   "WHERE username = '" + req.body.username + 
+				   "' AND password = '" + req.body.password + 
 				   "'";
 
 		var query = client.query(sql, function(err, result) {
@@ -183,8 +158,9 @@ function getWeeklyUpdateFromDb(userId, callback) {
 		}
 
 		var sql =  "SELECT total_work_time_day, total_available_time_day " +
-				   "FROM day " +
-				   "WHERE planner_id = " + userId;
+				   "FROM day "                                             +
+				   "WHERE planner_id = "                                   + 
+				   userId;
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
@@ -220,12 +196,8 @@ function getDaysAndTasks(request, response) {
 			days[6]  = {};
 			days[7]  = {};
 
-			console.log("TEST2!!!!!" + JSON.stringify(result));
-
 			for (const index in result) {
-				// var dayId = result[index].day_id;
 				var dayId = ((parseInt(result[index].day_id) - 1) % 7 + 1);
-				// (14 - 1) mod 7 + 1
 				console.log("dayId:" + dayId);
 				days[dayId]["name"]                     = result[index].name;
 				days[dayId]["total_available_time_day"] = result[index].total_available_time_day;
@@ -251,25 +223,6 @@ function getDaysAndTasksFromDb(userId, callback) {
 			console.log(err);
 			callback(err, null);
 		}
-
-
-// 		SELECT
-// * FROM
-// (
-// SELECT 
-// *
-// --td.task_day_id, td.task_id, td.day_id, td.planner_id, t.task_id, t.class, t.description,
-// --t.due_time, t.total_work_time, d.day_id, d.name, d.total_work_time_day,
-// --d.total_available_time_day 
-// FROM task_day as td
-// INNER JOIN task as t 
-// ON td.task_id = t.task_id 
-// ) as t2
-// RIGHT JOIN (select * from day where planner_id = 2) as d 
-// ON t2.day_id = d.day_id 
-// --WHERE td.planner_id = " + userId +
-// ORDER BY t2.due_time ASC;
-
 
 		var sql =  "SELECT "                                                                        +
 					"* " +
@@ -317,20 +270,18 @@ function createNewTask(req, res) {
 			}
 
 			var dayId = (parseInt(req.session.user) - 1) * 7 + parseInt(result.last_day_id);
-			console.log("TEST3!!!!!!!!" + dayId)
-
 
 			var sql = "INSERT INTO task_day" 		+
 						"("							+
-						  "task_id"					+
-						  ", day_id"					+
-						  ", planner_id"					+
+						    "task_id"		        +
+						  ", day_id"				+
+						  ", planner_id"			+
 						") "						+
 						"VALUES"					+
 						"("							+ 
-						      result.last_task_id 	+ 
-							  "," + dayId	+ 
-							  "," + req.session.user	+ 
+							result.last_task_id 	+ 
+							"," + dayId	            + 
+							"," + req.session.user	+ 
 						")";
 			
 			var sqlUpdate = "UPDATE day "                                      +
@@ -349,7 +300,6 @@ function createNewTask(req, res) {
 				});
 			});
 		});
-
 		console.log("Inserted new task_day value...");		
 	}, req, res);
 }
@@ -402,7 +352,6 @@ function insertNewTaskIntoDb(callback, req, res) {
 			});
 		});
 	});
-
 	console.log("Inserted new task...");
 }
 
@@ -416,6 +365,7 @@ function updateAvailableTime(request, response) {
 			console.log("Error connecting to DB: ")
 			console.log(err);
 		}
+
 		var dayId = (parseInt(request.session.user) - 1) * 7 + parseInt(request.body.day_id);
 
 		var sql = "UPDATE day SET total_available_time_day = " + 
@@ -432,7 +382,6 @@ function updateAvailableTime(request, response) {
 			});
 		});
 	});
-
 	console.log("Updated available time in day table...");			
 }
 
@@ -454,7 +403,8 @@ function deleteTask(request, response) {
                         "(SELECT day_id FROM task_day WHERE task_id = "               + 
                              request.body.task_id + ")";
 
-		var sql = "DELETE FROM task_day WHERE task_id = " + request.body.task_id + ";" +
+		var sql = "DELETE FROM task_day WHERE task_id = " + request.body.task_id + 
+		          ";" +
 				  "DELETE FROM task     WHERE task_id = " + request.body.task_id;
 
 		sqlUpdate += ";" + sql;
@@ -467,6 +417,5 @@ function deleteTask(request, response) {
 			});
 		});
 	});
-
 	console.log("Deleted task...");			
 }
