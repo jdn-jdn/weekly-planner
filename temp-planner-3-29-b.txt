@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <link rel="icon" href="images/icon.png">
   <title>
-    Home | Weekly Planner
+    Weekly Planner
   </title>
   <link href="./../../public/stylesheets/planner.css" rel="stylesheet" type="text/css"/>
   <script src="./../../public/scripts/main.js"></script>
@@ -15,7 +15,7 @@
     crossorigin="anonymous">
   </script>
 </head>
-<body onload="update()">
+<body>
   <div class="a">
     <div class="grid-container-week">
       <div class="item1" style="padding-top: 5%">
@@ -144,7 +144,7 @@
       </div>        
       <div class="item4">
         <% for(var j = 0; j < daysAndTasks.length; j++) { %>
-          <% if (((daysAndTasks[j].day_id - 1) % 7 + 1) == i + 1 && daysAndTasks[j].task_id != null) { %>
+          <% if (daysAndTasks[j].day_id == i + 1 && daysAndTasks[j].task_id != null) { %>
             <div style="padding-bottom: 1%; padding-top: 1%; border-bottom: 1px dotted black">
               <strong>Class</strong>: <%= daysAndTasks[j].class %>                           <br/> 
               <strong>Task</strong>: <%= daysAndTasks[j].description %>                      <br/>
@@ -164,7 +164,7 @@
                   </form>
               </div>
             </div> 
-          <% } else if (((daysAndTasks[j].day_id - 1) % 7 + 1) == i + 1 && daysAndTasks[j].task_id == null) { %>
+          <% } else if (daysAndTasks[j].day_id == i + 1 && daysAndTasks[j].task_id == null) { %>
             <em>No tasks to display.</em>
           <% } %>        
         <% } %>

@@ -159,7 +159,7 @@ function getUserCredsFromDb(req, res, callback) {
 
 function getWeeklyUpdate(request, response) {
 	// Using a helper function to query DB and provide callback after processing
-	getWeeklyUpdateFromDb(request.session.user, function(error, result) {
+	getWeeklyUpdateFromDb(function(error, result) {
 		// Callback function that will be called when the DB done
 		if (error || result == null) {
 			response.status(500).json({success: false, data: error});
@@ -170,7 +170,7 @@ function getWeeklyUpdate(request, response) {
 	});
 }
 
-function getWeeklyUpdateFromDb(userId, callback) {
+function getWeeklyUpdateFromDb(callback) {
 	console.log("Getting weekly update from DB...");
 
 	var client = new pg.Client(connectionString);
@@ -183,8 +183,7 @@ function getWeeklyUpdateFromDb(userId, callback) {
 		}
 
 		var sql =  "SELECT total_work_time_day, total_available_time_day " +
-				   "FROM day " +
-				   "WHERE planner_id = " + userId;
+                   "FROM day";
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
@@ -416,13 +415,11 @@ function updateAvailableTime(request, response) {
 			console.log("Error connecting to DB: ")
 			console.log(err);
 		}
-		var dayId = (parseInt(request.session.user) - 1) * 7 + parseInt(request.body.day_id);
 
 		var sql = "UPDATE day SET total_available_time_day = " + 
                    request.body.available_time                 + 
                    " WHERE day_id = "                          + 
-                   dayId;
-                //    request.body.day_id;
+                   request.body.day_id;
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client

@@ -61,7 +61,6 @@ app.post('/login', function handleLogin(req, res) {
 
 	// Using a helper function to query DB and provide callback after processing
 	getUserCredsFromDb(req, res, function(error, dbResult) {
-		console.log("TEST!!!!!" + dbResult);
 		// Callback function that will be called when the DB done
 		if (error || dbResult == null) {
 			res.status(500).json({success: false, data: error});
@@ -159,7 +158,7 @@ function getUserCredsFromDb(req, res, callback) {
 
 function getWeeklyUpdate(request, response) {
 	// Using a helper function to query DB and provide callback after processing
-	getWeeklyUpdateFromDb(request.session.user, function(error, result) {
+	getWeeklyUpdateFromDb(function(error, result) {
 		// Callback function that will be called when the DB done
 		if (error || result == null) {
 			response.status(500).json({success: false, data: error});
@@ -170,7 +169,7 @@ function getWeeklyUpdate(request, response) {
 	});
 }
 
-function getWeeklyUpdateFromDb(userId, callback) {
+function getWeeklyUpdateFromDb(callback) {
 	console.log("Getting weekly update from DB...");
 
 	var client = new pg.Client(connectionString);
@@ -183,8 +182,7 @@ function getWeeklyUpdateFromDb(userId, callback) {
 		}
 
 		var sql =  "SELECT total_work_time_day, total_available_time_day " +
-				   "FROM day " +
-				   "WHERE planner_id = " + userId;
+                   "FROM day";
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
@@ -220,13 +218,8 @@ function getDaysAndTasks(request, response) {
 			days[6]  = {};
 			days[7]  = {};
 
-			console.log("TEST2!!!!!" + JSON.stringify(result));
-
 			for (const index in result) {
-				// var dayId = result[index].day_id;
-				var dayId = ((parseInt(result[index].day_id) - 1) % 7 + 1);
-				// (14 - 1) mod 7 + 1
-				console.log("dayId:" + dayId);
+				var dayId = result[index].day_id;
 				days[dayId]["name"]                     = result[index].name;
 				days[dayId]["total_available_time_day"] = result[index].total_available_time_day;
 				days[dayId]["total_work_time_day"]      = result[index].total_work_time_day;
@@ -252,39 +245,17 @@ function getDaysAndTasksFromDb(userId, callback) {
 			callback(err, null);
 		}
 
-
-// 		SELECT
-// * FROM
-// (
-// SELECT 
-// *
-// --td.task_day_id, td.task_id, td.day_id, td.planner_id, t.task_id, t.class, t.description,
-// --t.due_time, t.total_work_time, d.day_id, d.name, d.total_work_time_day,
-// --d.total_available_time_day 
-// FROM task_day as td
-// INNER JOIN task as t 
-// ON td.task_id = t.task_id 
-// ) as t2
-// RIGHT JOIN (select * from day where planner_id = 2) as d 
-// ON t2.day_id = d.day_id 
-// --WHERE td.planner_id = " + userId +
-// ORDER BY t2.due_time ASC;
-
-
 		var sql =  "SELECT "                                                                        +
-					"* " +
-		                // "td.task_day_id, td.task_id, td.day_id, td.planner_id, t.task_id, t.class, t.description," +
-		                // "t.due_time, t.total_work_time, d.day_id, d.name, d.total_work_time_day,"   +
-		                // "d.total_available_time_day "                                               +
-		           	// "FROM task_day as td "                                                          +
-		           	"FROM (select * from task_day as td inner join task as t on td.task_id = t.task_id) as t2 "    +
-					// "INNER JOIN task as t "                                                         +
-					// 	"ON td.task_id = t.task_id "                                                +
-					// "RIGHT JOIN day as d "                                                          +
-					"RIGHT JOIN (select * from day where planner_id = " + userId + ") as d "  +
-						" ON t2.day_id = d.day_id "                                                  +
+		                "td.task_day_id, td.task_id, td.day_id, td.planner_id, t.task_id, t.class, t.description," +
+		                "t.due_time, t.total_work_time, d.day_id, d.name, d.total_work_time_day,"   +
+		                "d.total_available_time_day "                                               +
+		           	"FROM task_day as td "                                                          +
+					"INNER JOIN task as t "                                                         +
+						"ON td.task_id = t.task_id "                                                +
+					"RIGHT JOIN day as d "                                                          +
+						" ON td.day_id = d.day_id "                                                  +
 					// "WHERE td.planner_id = " + userId +
-                    "ORDER BY t2.due_time ASC";
+                    "ORDER BY t.due_time ASC";
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
@@ -297,7 +268,7 @@ function getDaysAndTasksFromDb(userId, callback) {
 				console.log(err);
 				callback(err, null);
 			}
-			console.log("TEST FOR RESULT: " + JSON.stringify(result.rows))
+
 			// Giving results to callback
 			callback(null, result.rows);
 		});
@@ -316,28 +287,22 @@ function createNewTask(req, res) {
 				console.log(err);
 			}
 
-			var dayId = (parseInt(req.session.user) - 1) * 7 + parseInt(result.last_day_id);
-			console.log("TEST3!!!!!!!!" + dayId)
-
-
 			var sql = "INSERT INTO task_day" 		+
 						"("							+
 						  "task_id"					+
-						  ", day_id"					+
-						  ", planner_id"					+
+						", day_id"					+
 						") "						+
 						"VALUES"					+
 						"("							+ 
 						      result.last_task_id 	+ 
-							  "," + dayId	+ 
-							  "," + req.session.user	+ 
+						"," + result.last_day_id	+ 
 						")";
 			
 			var sqlUpdate = "UPDATE day "                                      +
 			                "SET total_work_time_day = total_work_time_day + " + 
 							result.work_time                                   + 
 							" WHERE day_id = "                                 + 
-							dayId;
+							result.last_day_id;
 					
 			sql += ";" + sqlUpdate;
 
@@ -416,13 +381,11 @@ function updateAvailableTime(request, response) {
 			console.log("Error connecting to DB: ")
 			console.log(err);
 		}
-		var dayId = (parseInt(request.session.user) - 1) * 7 + parseInt(request.body.day_id);
 
 		var sql = "UPDATE day SET total_available_time_day = " + 
                    request.body.available_time                 + 
                    " WHERE day_id = "                          + 
-                   dayId;
-                //    request.body.day_id;
+                   request.body.day_id;
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
