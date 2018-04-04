@@ -643,30 +643,47 @@ function insertNewTaskIntoDb(callback, req, res) {
 function updateAvailableTime(request, response) {
 	console.log("Updating day table...");
 
-	var client = new pg.Client(connectionString);
+	var dayId = (parseInt(request.session.user) - 1) * 7 + parseInt(request.body.day_id);
+	var query = sql`UPDATE day \
+					SET total_available_time_day = \
+					${request.body.available_time} \
+					WHERE day_id = \
+					${dayId}`;
 
-	client.connect(function(err) {
+	db.query(query, function(err, result) {
+		// Done getting data from DB; disconnect the client
 		if (err) {
 			console.log("Error connecting to DB: ")
 			console.log(err);
 		}
-
-		var dayId = (parseInt(request.session.user) - 1) * 7 + parseInt(request.body.day_id);
-
-		var sql = "UPDATE day SET total_available_time_day = " + 
-                   request.body.available_time                 + 
-                   " WHERE day_id = "                          + 
-                   dayId;
-                //    request.body.day_id;
-
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-				getDaysAndTasks(request, response);
-			});
-		});
+		
+		getDaysAndTasks(request, response);
 	});
+
+	// var client = new pg.Client(connectionString);
+
+	// client.connect(function(err) {
+	// 	if (err) {
+	// 		console.log("Error connecting to DB: ")
+	// 		console.log(err);
+	// 	}
+
+	// 	var dayId = (parseInt(request.session.user) - 1) * 7 + parseInt(request.body.day_id);
+
+	// 	var sql = "UPDATE day SET total_available_time_day = " + 
+    //                request.body.available_time                 + 
+    //                " WHERE day_id = "                          + 
+    //                dayId;
+    //             //    request.body.day_id;
+
+	// 	var query = client.query(sql, function(err, result) {
+	// 		// Done getting data from DB; disconnect the client
+	// 		client.end(function(err) {
+	// 			if (err) throw err;
+	// 			getDaysAndTasks(request, response);
+	// 		});
+	// 	});
+	// });
 	console.log("Updated available time in day table...");			
 }
 
