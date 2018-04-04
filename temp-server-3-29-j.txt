@@ -577,66 +577,45 @@ function insertNewTaskIntoDb(callback, req, res) {
 
 	console.log("Inserting new task into DB...");
 
-	var query = sql`INSERT INTO task  \
-					(class, description, due_time, total_work_time)  \
-					VALUES \
-					(${course}, ${description}, ${due}, ${work_time}) \
-					RETURNING task_id`;
+	var client = new pg.Client(connectionString);
 
-	db.query(query, function(err, result) {
-		// Done getting data from DB; disconnect the client
+	client.connect(function(err) {
 		if (err) {
 			console.log("Error connecting to DB: ")
 			console.log(err);
-			return callback(err, null);
+			callback(err, null);
 		}
 
-		callback(null, {
-			last_task_id: result.rows[0].task_id,
-			last_day_id: dayId,
-			work_time: work_time
+		var sql = "INSERT INTO task"           +
+                  "("                          +
+                      "class"                  +
+				   ", description"             +
+				   ", due_time"                +
+				   ", total_work_time"         +
+				   ") "                        +
+				   "VALUES"                    +
+				   "("                         + 
+				   "'" + course      + "'"     + 
+				   ", '" + description + "'"   + 
+				   ", '" + due         + "'"   + 
+				   ", "  + work_time           + 
+				   ") "                        +
+				   "RETURNING task_id";
+
+		var query = client.query(sql, function(err, result) {
+			// Done getting data from DB; disconnect the client
+			
+			client.end(function(err) {
+				if (err) throw err;
+			});
+
+			callback(null, {
+				last_task_id: result.rows[0].task_id,
+				last_day_id: dayId,
+				work_time: work_time
+			});
 		});
 	});
-
-	// var client = new pg.Client(connectionString);
-
-	// client.connect(function(err) {
-	// 	if (err) {
-	// 		console.log("Error connecting to DB: ")
-	// 		console.log(err);
-	// 		callback(err, null);
-	// 	}
-
-	// 	var sql = "INSERT INTO task"           +
-    //               "("                          +
-    //                   "class"                  +
-	// 			   ", description"             +
-	// 			   ", due_time"                +
-	// 			   ", total_work_time"         +
-	// 			   ") "                        +
-	// 			   "VALUES"                    +
-	// 			   "("                         + 
-	// 			   "'" + course      + "'"     + 
-	// 			   ", '" + description + "'"   + 
-	// 			   ", '" + due         + "'"   + 
-	// 			   ", "  + work_time           + 
-	// 			   ") "                        +
-	// 			   "RETURNING task_id";
-
-	// 	var query = client.query(sql, function(err, result) {
-	// 		// Done getting data from DB; disconnect the client
-			
-	// 		client.end(function(err) {
-	// 			if (err) throw err;
-	// 		});
-
-	// 		callback(null, {
-	// 			last_task_id: result.rows[0].task_id,
-	// 			last_day_id: dayId,
-	// 			work_time: work_time
-	// 		});
-	// 	});
-	// });
 	console.log("Inserted new task...");
 }
 
