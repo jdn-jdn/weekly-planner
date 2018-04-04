@@ -155,13 +155,13 @@ function createNewUser(username, password, callback) {
 					           ",'" + password + "'"  +
 					           ")";
 						
-						"INSERT INTO day (name, planner_id) VALUES ('Monday', "    + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Wednesday', " + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Thursday', "  + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Friday', "    + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + "1);" +
-						"INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + "1)";
+						// "INSERT INTO day (name, planner_id) VALUES ('Monday', "    + "1);" +
+						// "INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + "1);" +
+						// "INSERT INTO day (name, planner_id) VALUES ('Wednesday', " + "1);" +
+						// "INSERT INTO day (name, planner_id) VALUES ('Thursday', "  + "1);" +
+						// "INSERT INTO day (name, planner_id) VALUES ('Friday', "    + "1);" +
+						// "INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + "1);" +
+						// "INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + "1)";
 
 		var sqlGetIdSubQuery = "(SELECT planner_id FROM planner WHERE username = '" + 
 		                       username + 
@@ -177,7 +177,8 @@ function createNewUser(username, password, callback) {
 							"INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + sqlGetIdSubQuery + ");" +
 							"INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + sqlGetIdSubQuery + ")";
 
-		sql = sqlCreate + ";"+ sqlGrant1 + ";"+ sqlGrant2 + ";"+ sqlInsertPlanner + ";" + sqlInsertDays;
+							// sql = sqlCreate + ";"+ sqlGrant1 + ";"+ sqlGrant2 + ";"+ sqlInsertPlanner + ";" + sqlInsertDays;
+							sql = sqlInsertPlanner + ";" + sqlInsertDays;
 
 		var query = client.query(sql, function(err, result) {
 			// Done getting data from DB; disconnect the client
