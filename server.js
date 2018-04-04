@@ -112,6 +112,7 @@ function handleLogin(req, res) {
 	// Using a helper function to query DB and provide callback after processing
 	getUserCredsFromDb(req, res, function(error, dbResult) {
 		// Callback function that will be called when the DB done
+		console.log("TEST!!!!!!!!!" + JSON.stringify(dbResult));
 		if (error || dbResult == null) {
 			res.status(500).json({success: false, data: error});
 		} else {
@@ -119,14 +120,26 @@ function handleLogin(req, res) {
 			var username = dbResult[0]["username"];
 			var password = dbResult[0]["password"];
 			var result = {success: false};
-			if (req.body.username == username && req.body.password == password) {
-				req.session.user = userId;
-				result = {
-					success: true,
-					data: dbResult
-				};
-			}
-			res.json(result);
+
+
+			
+			// if (req.body.username == username && req.body.password == password) {
+			bcrypt.compare(req.body.password, password, function(err, result) {
+				if(result) {
+					req.session.user = userId;
+					result = {
+						success: true,
+						data: dbResult
+					};
+				}
+				res.json(result);
+			});
+				// req.session.user = userId;
+				// result = {
+				// 	success: true,
+				// 	data: dbResult
+				// };
+			// }
 		}
 	});
 }
@@ -259,11 +272,11 @@ function getUserCredsFromDb(req, res, callback) {
 	// 		"'";
 
 	var username =  req.body.username;
-	var password =  req.body.password;
+	// var password =  req.body.password;
 	var query =  sql`SELECT planner_id, username, password \
 				  FROM planner                             \
-				  WHERE username = ${username}             \
-				  AND password = ${password}`;
+				  WHERE username = ${username}`;             
+				//   AND password = ${password}`;
 
 	db.query(query, function(err, result) {
 		// Done getting data from DB; disconnect the client
