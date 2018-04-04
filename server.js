@@ -114,7 +114,7 @@ function handleLogin(req, res) {
 	// Using a helper function to query DB and provide callback after processing
 	getUserCredsFromDb(req, res, function(error, dbResult) {
 		// Callback function that will be called when the DB done
-		if (error || dbResult == null) {
+		if (error || dbResult == null || dbResult.length === 0) {
 			res.status(500).json({success: false, data: error});
 		} else {
 			var userId   = dbResult[0]["planner_id"];
@@ -123,6 +123,10 @@ function handleLogin(req, res) {
 			var result = {success: false};
 			
 			bcrypt.compare(req.body.password, password, function(err, result) {
+				if (err || result == null) {
+					res.status(500).json({success: false, data: err});
+				} 
+
 				if(result) {
 					req.session.user = userId;
 					result = {

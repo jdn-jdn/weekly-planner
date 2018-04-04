@@ -71,6 +71,7 @@ function login() {
             window.location.replace("/");
 		} else {
 			console.log("Error logging in.");
+			console.log("Error:" + result.data);
 			alert("Error logging in");
 		}
 	});

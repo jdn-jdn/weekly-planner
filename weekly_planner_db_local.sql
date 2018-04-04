@@ -14,13 +14,8 @@ DROP USER IF EXISTS test_user2;
 CREATE TABLE planner
 (
    planner_id          SERIAL         PRIMARY KEY
-,  first_name          VARCHAR(100)   
-,  middle_initial      CHAR(1)
-,  last_name           VARCHAR(100)   
-,  email               VARCHAR(200)                 UNIQUE
 ,  username            VARCHAR(100)   NOT NULL      UNIQUE
 ,  password            VARCHAR(100)   NOT NULL
-,  planner_image_url   TEXT                      
 );
 
 CREATE TABLE task
