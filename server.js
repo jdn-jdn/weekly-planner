@@ -2,10 +2,17 @@ const path = require('path');
 const PORT = process.env.PORT || 5000;
 const express = require('express');
 const app = express();
+const session = require('express-session');
 const bodyParser = require('body-parser');
+const pga = require('pga');
+const sql = require('pga-sql');
 const pg = require("pg");
 const connectionString = process.env.DATABASE_URL || "postgres://postgres:password@localhost:5432/weekly_planner";
-const session = require('express-session');
+var parse = require('pg-connection-string').parse;;
+var config = parse(connectionString);
+var bcrypt = require('bcryptjs');
+
+var db = pga(config);
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'ejs');
@@ -81,9 +88,20 @@ function handleSignup(req, res) {
 			if (dbResult.length === 0) {
 				// Username doesn't already exist
 				result = {success: true};
-				createNewUser(req.body.username, req.body.password, function (error, dbNewUserResult) {
-					console.log("Successfully created new user...");
+
+				bcrypt.hash(req.body.password, 8, function(error, hash) {
+					if (error) {
+						return res.status(500).json({success: false, data: error});
+					}
+
+					createNewUser(req.body.username, hash, function (error, dbNewUserResult) {
+						console.log("Successfully created new user...");
+					});
 				});
+
+				// createNewUser(req.body.username, req.body.password, function (error, dbNewUserResult) {
+				// 	console.log("Successfully created new user...");
+				// });
 			}
 			res.json(result);
 		}
@@ -116,44 +134,77 @@ function handleLogin(req, res) {
 function createNewUser(username, password, callback) {
 	console.log("Inserting new user into DB...");
 
-	var client = new pg.Client(connectionString);
+	// var sqlInsertPlanner = "INSERT INTO planner " +
+	// 					   "("                    +
+	// 						 "username"           +
+	// 					   ", password"           +
+	// 					   ") "                   +
+	// 					   "VALUES "              +
+	// 					   "("                    +
+	// 					   "'"  + username + "'"  +
+	// 					   ",'" + password + "'"  +
+	// 					   ")";
 
-	client.connect(function(err) {
+	var query1 = sql`INSERT INTO planner (username, password) VALUES (${username}, ${password})`;
+
+	var query2 = sql`INSERT INTO day (name, planner_id) VALUES    \
+					('Monday', (SELECT planner_id FROM planner WHERE username = ${username})),    \
+					('Tuesday', (SELECT planner_id FROM planner WHERE username = ${username})),    \
+					('Wednesday', (SELECT planner_id FROM planner WHERE username = ${username})),    \
+					('Thursday', (SELECT planner_id FROM planner WHERE username = ${username})),    \
+					('Friday', (SELECT planner_id FROM planner WHERE username = ${username})),    \
+					('Saturday', (SELECT planner_id FROM planner WHERE username = ${username})),    \
+					('Sunday', (SELECT planner_id FROM planner WHERE username = ${username}));`    
+
+	db.transact(query1, query2, function(err, result) {
 		if (err) {
-			console.log("Error connecting to DB: ")
+			console.log("Error in query: ")
 			console.log(err);
-			callback(err, null);
+			return callback(err, null);
 		}
+
+		// Giving results to callback
+		callback(null, result.rows);
+	});
+
+	// var client = new pg.Client(connectionString);
+
+	// client.connect(function(err) {
+	// 	if (err) {
+	// 		console.log("Error connecting to DB: ")
+	// 		console.log(err);
+	// 		callback(err, null);
+	// 	}
 		
-		var sql = "";
+	// 	var sql = "";
 
-		var sqlCreate = "CREATE USER "     + 
-		                username           + 
-						" WITH PASSWORD '" + 
-						password           + 
-						"'";
+		// var sqlCreate = "CREATE USER "     + 
+		//                 username           + 
+		// 				" WITH PASSWORD '" + 
+		// 				password           + 
+		// 				"'";
 
-		var sqlGrant1 = "GRANT SELECT, INSERT, UPDATE, DELETE "  + 
-						"ON planner, day, task, task_day, week " + 
-						"TO "                                    + 
-						username;
+		// var sqlGrant1 = "GRANT SELECT, INSERT, UPDATE, DELETE "  + 
+		// 				"ON planner, day, task, task_day, week " + 
+		// 				"TO "                                    + 
+		// 				username;
 
-		var sqlGrant2 = "GRANT USAGE, SELECT "                                                   +
-						"ON SEQUENCE planner_planner_id_seq, day_day_id_seq, task_task_id_seq, " +
-						"task_day_task_day_id_seq, week_week_id_seq "                            +
-						"TO "                                                                    + 
-						username;
+		// var sqlGrant2 = "GRANT USAGE, SELECT "                                                   +
+		// 				"ON SEQUENCE planner_planner_id_seq, day_day_id_seq, task_task_id_seq, " +
+		// 				"task_day_task_day_id_seq, week_week_id_seq "                            +
+		// 				"TO "                                                                    + 
+		// 				username;
 
-		var sqlInsertPlanner = "INSERT INTO planner " +
-					           "("                    +
-					             "username"           +
-					           ", password"           +
-					           ") "                   +
-					           "VALUES "              +
-					           "("                    +
-					           "'"  + username + "'"  +
-					           ",'" + password + "'"  +
-					           ")";
+		// var sqlInsertPlanner = "INSERT INTO planner " +
+		// 			           "("                    +
+		// 			             "username"           +
+		// 			           ", password"           +
+		// 			           ") "                   +
+		// 			           "VALUES "              +
+		// 			           "("                    +
+		// 			           "'"  + username + "'"  +
+		// 			           ",'" + password + "'"  +
+		// 			           ")";
 						
 						// "INSERT INTO day (name, planner_id) VALUES ('Monday', "    + "1);" +
 						// "INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + "1);" +
@@ -163,111 +214,162 @@ function createNewUser(username, password, callback) {
 						// "INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + "1);" +
 						// "INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + "1)";
 
-		var sqlGetIdSubQuery = "(SELECT planner_id FROM planner WHERE username = '" + 
-		                       username + 
-							   "' AND password = '" + 
-							   password + 
-							   "')";
+		// var sqlGetIdSubQuery = "(SELECT planner_id FROM planner WHERE username = '" + 
+		//                        username + 
+		// 					   "' AND password = '" + 
+		// 					   password + 
+		// 					   "')";
 
-		var sqlInsertDays = "INSERT INTO day (name, planner_id) VALUES ('Monday', "    + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Wednesday', " + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Thursday', "  + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Friday', "    + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + sqlGetIdSubQuery + ");" +
-							"INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + sqlGetIdSubQuery + ")";
+		// var sqlInsertDays = "INSERT INTO day (name, planner_id) VALUES ('Monday', "    + sqlGetIdSubQuery + ");" +
+		// 					"INSERT INTO day (name, planner_id) VALUES ('Tuesday', "   + sqlGetIdSubQuery + ");" +
+		// 					"INSERT INTO day (name, planner_id) VALUES ('Wednesday', " + sqlGetIdSubQuery + ");" +
+		// 					"INSERT INTO day (name, planner_id) VALUES ('Thursday', "  + sqlGetIdSubQuery + ");" +
+		// 					"INSERT INTO day (name, planner_id) VALUES ('Friday', "    + sqlGetIdSubQuery + ");" +
+		// 					"INSERT INTO day (name, planner_id) VALUES ('Saturday', "  + sqlGetIdSubQuery + ");" +
+		// 					"INSERT INTO day (name, planner_id) VALUES ('Sunday', "    + sqlGetIdSubQuery + ")";
 
-							// sql = sqlCreate + ";"+ sqlGrant1 + ";"+ sqlGrant2 + ";"+ sqlInsertPlanner + ";" + sqlInsertDays;
-							sql = sqlInsertPlanner + ";" + sqlInsertDays;
+		// sql = sqlCreate + ";"+ sqlGrant1 + ";"+ sqlGrant2 + ";"+ sqlInsertPlanner + ";" + sqlInsertDays;
+	// 	sql = sqlInsertPlanner + ";" + sqlInsertDays;
 
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-			});
+	// 	var query = client.query("INSERT INTO planner(username, oasswird) VALUES($1, $2);",[ username, password ], function(err, result) {
+	// 		// Done getting data from DB; disconnect the client
+	// 		client.end(function(err) {
+	// 			if (err) throw err;
+	// 		});
 
-			if (err) {
-				console.log("Error in query: ")
-				console.log(err);
-				callback(err, null);
-			}
+	// 		if (err) {
+	// 			console.log("Error in query: ")
+	// 			console.log(err);
+	// 			callback(err, null);
+	// 		}
 
-			// Giving results to callback
-			callback(null, result.rows);
-		});
-	});
+	// 		// Giving results to callback
+	// 		callback(null, result.rows);
+	// 	});
+	// });
 }
 
 function getUserCredsFromDb(req, res, callback) {
 	console.log("Getting user credentials from DB...");
 
-	var client = new pg.Client(connectionString);
+	// var query =  "SELECT planner_id, username, password " +
+	// 		"FROM planner "                          +
+	// 		"WHERE username = '" + req.body.username + 
+	// 		"' AND password = '" + req.body.password + 
+	// 		"'";
 
-	client.connect(function(err) {
+	var username =  req.body.username;
+	var password =  req.body.password;
+	var query =  sql`SELECT planner_id, username, password \
+				  FROM planner                             \
+				  WHERE username = ${username}             \
+				  AND password = ${password}`;
+
+	db.query(query, function(err, result) {
+		// Done getting data from DB; disconnect the client
+		// client.end(function(err) {
+		// 	if (err) throw err;
+		// });
+
 		if (err) {
-			console.log("Error connecting to DB: ")
+			console.log("Error in query: ")
 			console.log(err);
-			callback(err, null);
+			return callback(err, null);
 		}
 
-		var sql =  "SELECT planner_id, username, password " +
-				   "FROM planner "                          +
-				   "WHERE username = '" + req.body.username + 
-				   "' AND password = '" + req.body.password + 
-				   "'";
-
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-			});
-
-			if (err) {
-				console.log("Error in query: ")
-				console.log(err);
-				callback(err, null);
-			}
-
-			// Giving results to callback
-			callback(null, result.rows);
-		});
+		// Giving results to callback
+		callback(null, result.rows);
 	});
 }
+
+	// var client = new pg.Client(connectionString);
+
+	// client.connect(function(err) {
+	// 	if (err) {
+	// 		console.log("Error connecting to DB: ")
+	// 		console.log(err);
+	// 		callback(err, null);
+	// 	}
+
+	// 	var sql =  "SELECT planner_id, username, password " +
+	// 			   "FROM planner "                          +
+	// 			   "WHERE username = '" + req.body.username + 
+	// 			   "' AND password = '" + req.body.password + 
+	// 			   "'";
+
+	// 	var query = client.query(sql, function(err, result) {
+	// 		// Done getting data from DB; disconnect the client
+	// 		client.end(function(err) {
+	// 			if (err) throw err;
+	// 		});
+
+	// 		if (err) {
+	// 			console.log("Error in query: ")
+	// 			console.log(err);
+	// 			callback(err, null);
+	// 		}
+
+	// 		// Giving results to callback
+	// 		callback(null, result.rows);
+	// 	});
+	// });
+// }
 
 function getUserCredsFromDbSignup(req, res, callback) {
 	console.log("Getting user credentials from DB...");
 
-	var client = new pg.Client(connectionString);
+	var username =  req.body.username;
+	var query =  sql`SELECT username                       \
+				  FROM planner                             \
+				  WHERE username = ${username}`;
 
-	client.connect(function(err) {
+	db.query(query, function(err, result) {
+		// Done getting data from DB; disconnect the client
+		// client.end(function(err) {
+		// 	if (err) throw err;
+		// });
+
 		if (err) {
-			console.log("Error connecting to DB: ")
+			console.log("Error in query: ")
 			console.log(err);
-			callback(err, null);
+			return callback(err, null);
 		}
 
-		var sql =  "SELECT username "   +
-				   "FROM planner "      +
-				   "WHERE username = '" + 
-				   req.body.username    +
-				   "'";
-
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-			});
-
-			if (err) {
-				console.log("Error in query: ")
-				console.log(err);
-				callback(err, null);
-			}
-
-			// Giving results to callback
-			callback(null, result.rows);
-		});
+		// Giving results to callback
+		callback(null, result.rows);
 	});
+
+	// var client = new pg.Client(connectionString);
+
+	// client.connect(function(err) {
+	// 	if (err) {
+	// 		console.log("Error connecting to DB: ")
+	// 		console.log(err);
+	// 		callback(err, null);
+	// 	}
+
+	// 	// var sql =  "SELECT username "   +
+	// 	// 		   "FROM planner "      +
+	// 	// 		   "WHERE username = '" + 
+	// 	// 		   req.body.username    +
+	// 	// 		   "'";
+
+	// 	var query = client.query(sql, function(err, result) {
+	// 		// Done getting data from DB; disconnect the client
+	// 		client.end(function(err) {
+	// 			if (err) throw err;
+	// 		});
+
+	// 		if (err) {
+	// 			console.log("Error in query: ")
+	// 			console.log(err);
+	// 			callback(err, null);
+	// 		}
+
+	// 		// Giving results to callback
+	// 		callback(null, result.rows);
+	// 	});
+	// });
 }
 
 function getWeeklyUpdate(request, response) {
