@@ -480,90 +480,150 @@ function getDaysAndTasks(request, response) {
 function getDaysAndTasksFromDb(userId, callback) {
 	console.log("Getting days from DB...");
 
-	var client = new pg.Client(connectionString);
+	var query = sql`SELECT  \
+					t2.task_day_id, t2.task_id, t2.planner_id, t2.class, t2.description, t2.due_time, t2.total_work_time, \
+					d.day_id, d.name, d.total_work_time_day, d.total_available_time_day, d.planner_id \
+					FROM  \
+					( \
+					select td.task_day_id, td.task_id, td.day_id, td.planner_id,  \
+					t.class, t.description, t.due_time, t.total_work_time \
+					from task_day as td inner join task as t on td.task_id = t.task_id \
+					)  \
+					as t2 \
+					RIGHT JOIN  \
+					( \
+					select day_id, name, total_work_time_day, total_available_time_day, planner_id \
+					from day where planner_id = ${userId} \
+					)  \
+					as d \
+					ON t2.day_id = d.day_id \
+					ORDER BY t2.due_time ASC`;
 
-	client.connect(function(err) {
+	db.query(query, function(err, result) {
+		// Done getting data from DB; disconnect the client
 		if (err) {
-			console.log("Error connecting to DB: ")
+			console.log("Error in query: ")
 			console.log(err);
-			callback(err, null);
+			return callback(err, null);
 		}
-
-		var sql =  "SELECT "                                                                        +
-					"* " +
-		                // "td.task_day_id, td.task_id, td.day_id, td.planner_id, t.task_id, t.class, t.description," +
-		                // "t.due_time, t.total_work_time, d.day_id, d.name, d.total_work_time_day,"   +
-		                // "d.total_available_time_day "                                               +
-		           	// "FROM task_day as td "                                                          +
-		           	"FROM (select * from task_day as td inner join task as t on td.task_id = t.task_id) as t2 "    +
-					// "INNER JOIN task as t "                                                         +
-					// 	"ON td.task_id = t.task_id "                                                +
-					// "RIGHT JOIN day as d "                                                          +
-					"RIGHT JOIN (select * from day where planner_id = " + userId + ") as d "  +
-						" ON t2.day_id = d.day_id "                                                  +
-					// "WHERE td.planner_id = " + userId +
-                    "ORDER BY t2.due_time ASC";
-
-		var query = client.query(sql, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-			});
-
-			if (err) {
-				console.log("Error in query: ")
-				console.log(err);
-				callback(err, null);
-			}
-			// Giving results to callback
-			callback(null, result.rows);
-		});
+		// Giving results to callback
+		callback(null, result.rows);
 	});
+
+	// var client = new pg.Client(connectionString);
+
+	// client.connect(function(err) {
+	// 	if (err) {
+	// 		console.log("Error connecting to DB: ")
+	// 		console.log(err);
+	// 		callback(err, null);
+	// 	}
+
+	// 	var sql =  "SELECT "                                                                        +
+	// 				"* " +
+	// 	                // "td.task_day_id, td.task_id, td.day_id, td.planner_id, t.task_id, t.class, t.description," +
+	// 	                // "t.due_time, t.total_work_time, d.day_id, d.name, d.total_work_time_day,"   +
+	// 	                // "d.total_available_time_day "                                               +
+	// 	           	// "FROM task_day as td "                                                          +
+	// 	           	"FROM (select * from task_day as td inner join task as t on td.task_id = t.task_id) as t2 "    +
+	// 				// "INNER JOIN task as t "                                                         +
+	// 				// 	"ON td.task_id = t.task_id "                                                +
+	// 				// "RIGHT JOIN day as d "                                                          +
+	// 				"RIGHT JOIN (select * from day where planner_id = " + userId + ") as d "  +
+	// 					" ON t2.day_id = d.day_id "                                                  +
+	// 				// "WHERE td.planner_id = " + userId +
+    //                 "ORDER BY t2.due_time ASC";
+
+	// 	var query = client.query(sql, function(err, result) {
+	// 		// Done getting data from DB; disconnect the client
+	// 		client.end(function(err) {
+	// 			if (err) throw err;
+	// 		});
+
+	// 		if (err) {
+	// 			console.log("Error in query: ")
+	// 			console.log(err);
+	// 			callback(err, null);
+	// 		}
+	// 		// Giving results to callback
+	// 		callback(null, result.rows);
+	// 	});
+	// });
 }
 
 function createNewTask(req, res) {
 	insertNewTaskIntoDb(function (error, result) {
 		console.log("Inserting new task_day value into DB...");
 
-		var client = new pg.Client(connectionString);
+		var dayId = (parseInt(req.session.user) - 1) * 7 + parseInt(result.last_day_id);
 
-		client.connect(function(err) {
+		var query1 = sql`INSERT INTO task_day    \
+						(    \
+						  task_id    \
+						, day_id    \
+						, planner_id    \
+						)   \
+						VALUES    \
+						(							   \
+							  ${result.last_task_id} 	    \
+							, ${dayId}	               \
+							, ${req.session.user}	    \
+						)`;
+
+		var query2 = sql`UPDATE day \                                     
+						SET total_work_time_day = total_work_time_day + \
+						${result.work_time}       \
+						WHERE day_id = \
+						${dayId}`;
+
+		db.transact(query1, query2, function(err, result) {
+			// Done getting data from DB; disconnect the client
 			if (err) {
 				console.log("Error connecting to DB: ")
 				console.log(err);
 			}
-
-			var dayId = (parseInt(req.session.user) - 1) * 7 + parseInt(result.last_day_id);
-
-			var sql = "INSERT INTO task_day" 		+
-						"("							+
-						    "task_id"		        +
-						  ", day_id"				+
-						  ", planner_id"			+
-						") "						+
-						"VALUES"					+
-						"("							+ 
-							result.last_task_id 	+ 
-							"," + dayId	            + 
-							"," + req.session.user	+ 
-						")";
-			
-			var sqlUpdate = "UPDATE day "                                      +
-			                "SET total_work_time_day = total_work_time_day + " + 
-							result.work_time                                   + 
-							" WHERE day_id = "                                 + 
-							dayId;
-					
-			sql += ";" + sqlUpdate;
-
-			var query = client.query(sql, function(err, result) {
-				// Done getting data from DB; disconnect the client
-				client.end(function(err) {
-					if (err) throw err;
-					getDaysAndTasks(req, res);
-				});
-			});
+			getDaysAndTasks(req, res);
 		});
+
+		// var client = new pg.Client(connectionString);
+
+		// client.connect(function(err) {
+		// 	if (err) {
+		// 		console.log("Error connecting to DB: ")
+		// 		console.log(err);
+		// 	}
+
+		// 	var dayId = (parseInt(req.session.user) - 1) * 7 + parseInt(result.last_day_id);
+
+		// 	var sql = "INSERT INTO task_day" 		+
+		// 				"("							+
+		// 				    "task_id"		        +
+		// 				  ", day_id"				+
+		// 				  ", planner_id"			+
+		// 				") "						+
+		// 				"VALUES"					+
+		// 				"("							+ 
+		// 					result.last_task_id 	+ 
+		// 					"," + dayId	            + 
+		// 					"," + req.session.user	+ 
+		// 				")";
+			
+		// 	var sqlUpdate = "UPDATE day "                                      +
+		// 	                "SET total_work_time_day = total_work_time_day + " + 
+		// 					result.work_time                                   + 
+		// 					" WHERE day_id = "                                 + 
+		// 					dayId;
+					
+		// 	sql += ";" + sqlUpdate;
+
+		// 	var query = client.query(sql, function(err, result) {
+		// 		// Done getting data from DB; disconnect the client
+		// 		client.end(function(err) {
+		// 			if (err) throw err;
+		// 			getDaysAndTasks(req, res);
+		// 		});
+		// 	});
+		// });
 		console.log("Inserted new task_day value...");		
 	}, req, res);
 }
@@ -690,34 +750,70 @@ function updateAvailableTime(request, response) {
 function deleteTask(request, response) {	
 	console.log("Deleting task #" + request.body.task_id);
 
-	var client = new pg.Client(connectionString);
+	var query1 = sql`UPDATE day \
+					SET total_work_time_day = total_work_time_day - \
+					( \
+						SELECT total_work_time \
+						FROM task WHERE task_id =          \
+						${request.body.task_id} )                              \
+						WHERE day_id =                                            \
+					( \
+						SELECT day_id FROM task_day \
+						WHERE task_id = \
+						${request.body.task_id} \
+					);`;
 
-	client.connect(function(err) {
+
+	var query2 = sql`DELETE \
+					FROM task_day \
+					WHERE task_id = ${request.body.task_id};`;
+	
+	var query3 = sql`DELETE \
+					FROM task \
+					WHERE task_id = ${request.body.task_id};`;
+
+	var queries = [query1, query2, query3]
+
+	// db.transact(query1, query2, query3, function(err, result) {
+	db.transact(queries, function(err, result) {
+		// Done getting data from DB; disconnect the client
 		if (err) {
 			console.log("Error connecting to DB: ")
 			console.log(err);
 		}
-
-		var sqlUpdate = "UPDATE day SET total_work_time_day = total_work_time_day - " + 
-                        "(SELECT total_work_time FROM task WHERE task_id = "          +
-                             request.body.task_id + ") "                              +
-						" WHERE day_id = "                                            + 
-                        "(SELECT day_id FROM task_day WHERE task_id = "               + 
-                             request.body.task_id + ")";
-
-		var sql = "DELETE FROM task_day WHERE task_id = " + request.body.task_id + 
-		          ";" +
-				  "DELETE FROM task     WHERE task_id = " + request.body.task_id;
-
-		sqlUpdate += ";" + sql;
-
-		var query = client.query(sqlUpdate, function(err, result) {
-			// Done getting data from DB; disconnect the client
-			client.end(function(err) {
-				if (err) throw err;
-				getDaysAndTasks(request, response);
-			});
-		});
+		if(result) {
+			getDaysAndTasks(request, response);
+		}
 	});
+
+	// var client = new pg.Client(connectionString);
+
+	// client.connect(function(err) {
+	// 	if (err) {
+	// 		console.log("Error connecting to DB: ")
+	// 		console.log(err);
+	// 	}
+
+		// var sqlUpdate = "UPDATE day SET total_work_time_day = total_work_time_day - " + 
+        //                 "(SELECT total_work_time FROM task WHERE task_id = "          +
+        //                      request.body.task_id + ") "                              +
+		// 				" WHERE day_id = "                                            + 
+        //                 "(SELECT day_id FROM task_day WHERE task_id = "               + 
+        //                      request.body.task_id + ")";
+
+		// var sql = "DELETE FROM task_day WHERE task_id = " + request.body.task_id + 
+		//           ";" +
+		// 		  "DELETE FROM task     WHERE task_id = " + request.body.task_id;
+
+	// 	sqlUpdate += ";" + sql;
+
+	// 	var query = client.query(sqlUpdate, function(err, result) {
+	// 		// Done getting data from DB; disconnect the client
+	// 		client.end(function(err) {
+	// 			if (err) throw err;
+	// 			getDaysAndTasks(request, response);
+	// 		});
+	// 	});
+	// });
 	console.log("Deleted task...");			
 }
