@@ -11,6 +11,7 @@ const connectionString = process.env.DATABASE_URL || "postgres://postgres:passwo
 var parse = require('pg-connection-string').parse;;
 var config = parse(connectionString);
 var bcrypt = require('bcryptjs');
+
 var db = pga(config);
 
 app.set('views', path.join(__dirname, '/views'));
@@ -119,6 +120,8 @@ function handleLogin(req, res) {
 			var username = dbResult[0]["username"];
 			var password = dbResult[0]["password"];
 			var result = {success: false};
+
+
 			
 			// if (req.body.username == username && req.body.password == password) {
 			bcrypt.compare(req.body.password, password, function(err, result) {
@@ -399,51 +402,36 @@ function getWeeklyUpdate(request, response) {
 function getWeeklyUpdateFromDb(userId, callback) {
 	console.log("Getting weekly update from DB...");
 
-	var query = sql`SELECT total_work_time_day, total_available_time_day \
-					FROM day \
-					WHERE planner_id =  ${userId}`;
+	var client = new pg.Client(connectionString);
 
-	db.query(query, function(err, result) {
+	client.connect(function(err) {
 		if (err) {
-			console.log("Error in query: ")
+			console.log("Error connecting to DB: ")
 			console.log(err);
-			return callback(err, null);
+			callback(err, null);
 		}
 
-		// Giving results to callback
-		callback(null, result.rows);
+		var sql =  "SELECT total_work_time_day, total_available_time_day " +
+				   "FROM day "                                             +
+				   "WHERE planner_id = "                                   + 
+				   userId;
+
+		var query = client.query(sql, function(err, result) {
+			// Done getting data from DB; disconnect the client
+			client.end(function(err) {
+				if (err) throw err;
+			});
+
+			if (err) {
+				console.log("Error in query: ")
+				console.log(err);
+				callback(err, null);
+			}
+
+			// Giving results to callback
+			callback(null, result.rows);
+		});
 	});
-
-	// var client = new pg.Client(connectionString);
-
-	// client.connect(function(err) {
-	// 	if (err) {
-	// 		console.log("Error connecting to DB: ")
-	// 		console.log(err);
-	// 		callback(err, null);
-	// 	}
-
-	// 	var sql =  "SELECT total_work_time_day, total_available_time_day " +
-	// 			   "FROM day "                                             +
-	// 			   "WHERE planner_id = "                                   + 
-	// 			   userId;
-
-	// 	var query = client.query(sql, function(err, result) {
-	// 		// Done getting data from DB; disconnect the client
-	// 		client.end(function(err) {
-	// 			if (err) throw err;
-	// 		});
-
-	// 		if (err) {
-	// 			console.log("Error in query: ")
-	// 			console.log(err);
-	// 			callback(err, null);
-	// 		}
-
-	// 		// Giving results to callback
-	// 		callback(null, result.rows);
-	// 	});
-	// });
 }
 
 function getDaysAndTasks(request, response) {
