@@ -31,10 +31,10 @@ app.use(session({
 	})
 );
 
-app.get('/', handleGet);
+app.get('/', getRouter);
 app.get('/weeklyUpdate', getWeeklyUpdate);
 
-app.post('/', handlePost);
+app.post('/', postRouter);
 app.post('/login', handleLogin);
 app.post('/signup', handleSignup);
 app.post('/logout', handleLogout);
@@ -44,7 +44,7 @@ app.listen(port, function() {
 });
 
 
-function handleGet(req, res) {
+function getRouter(req, res) {
 	console.log('Received get request...');
 	if (!req.session.user) {
 		console.log('No session active...');
@@ -55,7 +55,7 @@ function handleGet(req, res) {
 	}
 }
 
-function handlePost(req, res) {
+function postRouter(req, res) {
 	console.log('Received post request...');
 	if (req.body.available_time != null) {
 		console.log('Updating available time...');
